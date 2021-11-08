@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{25473A6F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.XUnitTests", "ChatApp.XUnitTests\ChatApp.XUnitTests.csproj", "{BE45B8EF-5C01-4DA5-96B1-4EE11EFA9E20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatApp.API.MIP", "ChatApp.API.MIP\ChatApp.API.MIP.csproj", "{4108A420-2536-40E1-AFF4-12F9CB7E4974}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChatApp.API.MIP", "ChatApp.API.MIP\ChatApp.API.MIP.csproj", "{4108A420-2536-40E1-AFF4-12F9CB7E4974}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
