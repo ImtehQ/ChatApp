@@ -1,5 +1,6 @@
 ﻿using ChapApp.Domain.Interfaces;
 using ChatApp.Domain.Enums;
+using ChatApp.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,10 +8,15 @@ namespace ChatApp.API.MIP.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[groups]")]
+    [Route("groups")]
     public class GroupsController : ControllerBase
     {
-        IDataService DataService { get; set; }
+        IGroupService _GroupService { get; set; }
+
+        public GroupsController(IGroupService GroupService)
+        {
+            _GroupService = GroupService;
+        }
 
         [HttpPost]
         [Route("groups")]

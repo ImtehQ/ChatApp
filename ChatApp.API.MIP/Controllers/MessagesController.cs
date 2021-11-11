@@ -1,4 +1,5 @@
 ﻿using ChapApp.Domain.Interfaces;
+using ChatApp.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,10 +11,15 @@ namespace ChatApp.API.MIP.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[messages]")]
+    [Route("messages")]
     public class MessagesController : ControllerBase
     {
-        IDataService DataService { get; set; }
+        IMessageService _MessageService { get; set; }
+
+        public MessagesController(IMessageService MessageService)
+        {
+            _MessageService = MessageService;
+        }
 
         [HttpPost]
         [Route("messages")]
@@ -23,7 +29,8 @@ namespace ChatApp.API.MIP.Controllers
         }
 
         [HttpPost]
-        [Route("messages/(?page={int}&type={n}&id=n)")]
+        [Route("messages/page")]
+        //[Route("messages/(?page={int}&type={n}&id=n)")]
         public void Register(int nl, int n, int N)
         {
             //TODO: WTF?!

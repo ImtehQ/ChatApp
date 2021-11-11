@@ -29,24 +29,29 @@ namespace ChatApp.API.MIP
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options => {
-                    options.Audience = "http://localhost:5001/";
-                    options.Authority = "http://localhost:5000/";
+                .AddJwtBearer(options =>
+                {
+                    options.Audience = "https://localhost:5001/";
+                    options.Authority = "https://localhost:5000/";
                 });
-                    //.AddMicrosoftIdentityWebApi(Configuration.GetSection("AzureAd"));
 
-                    services.AddControllers();
+            services.AddControllers();
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ChatApp.API.MIP", Version = "v1" });
             });
 
-            services.AddDbContext<UserContext>(options => 
+            services.AddDbContext<DataContext>(options => 
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<IDataService, DataService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<IMessageService, MessageService>();
+
             services.AddScoped<IJwtAuth, JWTAuthentication>();
+
             services.AddScoped<IRepository, EFRepository>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

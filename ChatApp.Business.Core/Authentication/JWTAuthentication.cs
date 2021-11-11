@@ -12,13 +12,10 @@ namespace ChatApp.Business.Core.Authentication
 {
     public class JWTAuthentication : IJwtAuth
     {
-        private readonly string username = "kirtesh";
-        private readonly string password = "Demo1";
-        private readonly string key;
 
-        public JWTAuthentication(string key)
+        public JWTAuthentication()
         {
-            this.key = key;
+            
         }
         public string Authentication(string username, string password)
         {
@@ -32,7 +29,7 @@ namespace ChatApp.Business.Core.Authentication
             var tokenHandler = new JwtSecurityTokenHandler();
 
             // 2. Create Private Key to Encrypted
-            var tokenKey = Encoding.ASCII.GetBytes(key);
+            var tokenKey = Encoding.ASCII.GetBytes("key");
 
             //3. Create JETdescriptor
             var tokenDescriptor = new SecurityTokenDescriptor()
