@@ -1,8 +1,7 @@
 using ChapApp.Business.Core.Repositorys;
 using ChapApp.Business.Domain.Interfaces;
-using ChapApp.Domain.Interfaces;
 using ChatApp.Business.Core.Authentication;
-using ChatApp.Business.Core.DBContexts;
+using ChatApp.Business.Core.DbContexts;
 using ChatApp.Business.Core.Services;
 using ChatApp.Domain.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -41,16 +40,19 @@ namespace ChatApp.API.MIP
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ChatApp.API.MIP", Version = "v1" });
             });
 
-            services.AddDbContext<DataContext>(options => 
-            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ChatAppContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+
+            services.AddScoped<IJwtAuth, JWTAuthentication>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IMessageService, MessageService>();
 
-            services.AddScoped<IJwtAuth, JWTAuthentication>();
-
-            services.AddScoped<IRepository, EFRepository>();
+            services.AddScoped<IUserRepository, EFUserRepository>();
+            services.AddScoped<IGroupRepository, EFGroupRepository>();
+            services.AddScoped<IMessageRepository, EFMessageRepository>();
 
         }
 

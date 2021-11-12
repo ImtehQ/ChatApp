@@ -8,6 +8,6 @@ namespace ChapApp.Business.Domain.Interfaces
 {
     public interface IRepository
     {
-        object _dataContext { get; }
+
     }
 }

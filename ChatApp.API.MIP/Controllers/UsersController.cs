@@ -1,5 +1,4 @@
 ﻿using ChapApp.Business.Domain.Extensions;
-using ChapApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,18 +28,18 @@ namespace ChatApp.API.MIP.Controllers
             if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Username))
                 return "";
 
-
-            return "Token hier duh";
+            return _UserService.Login(Username, Password);
         }
 
         [HttpGet]
-        public string Register(string Name, string Username, string Emailaddress, string Password)
+        [AllowAnonymous]
+        public IActionResult Register(string Name, string Username, string Emailaddress, string Password)
         {
             if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Username) ||
                 string.IsNullOrEmpty(Emailaddress))
-                return "poop";
-            return "";
+                return Ok("IsNullOrEmpty");
 
+            return Ok(_UserService.Register(Name, Username, Emailaddress, Password).Message);
         }
 
         [HttpPost]
