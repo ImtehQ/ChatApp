@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace ChatApp.Domain.Interfaces
 {
-    public interface IRepository<T>
+    public interface IResponse
     {
-        T Context { get; set; }
+        public bool IsValid { get; init; }
+        public bool IsNotValid { get; }
+        public string Message { get; init; }
     }
 }

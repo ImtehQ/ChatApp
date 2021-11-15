@@ -13,7 +13,7 @@ namespace ChatApp.Domain.Models
         public int MaxUsers {  get; set; }
         public int VisibilityType {  get; set; }
         public int Password {  get; set; }
-        public int[] ModeratorsIds {  get; set; }
+        public User[] Moderators {  get; set; }
         public int Admin { get; set; }
 
     }

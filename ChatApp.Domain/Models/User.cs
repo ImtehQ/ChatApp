@@ -14,6 +14,6 @@ namespace ChatApp.Domain.Models
         public int RoleId {  get; set; }
         public bool isBlocked {  get; set; }
         public bool RequiresVerification { get; set; }
-        public Message[] messagesIds {  get; set; }
+        public Message[] messages {  get; set; }
     }
 }

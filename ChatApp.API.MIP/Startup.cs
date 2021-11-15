@@ -1,6 +1,4 @@
 using ChapApp.Business.Core.Repositorys;
-using ChapApp.Business.Domain.Interfaces;
-using ChatApp.Business.Core.Authentication;
 using ChatApp.Business.Core.DbContexts;
 using ChatApp.Business.Core.Services;
 using ChatApp.Domain.Interfaces;
@@ -42,9 +40,6 @@ namespace ChatApp.API.MIP
 
             services.AddDbContext<ChatAppContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-
-            services.AddScoped<IJwtAuth, JWTAuthentication>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IGroupService, GroupService>();

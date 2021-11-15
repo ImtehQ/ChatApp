@@ -12,34 +12,37 @@ namespace ChatApp.API.MIP.Controllers
     {
         IUserService _UserService  {  get; set; }
 
-        IJwtAuth _JwtAuth { get; set; }
+       // IJwtAuth _JwtAuth { get; set; }
 
-        public UsersController(IUserService UserService, IJwtAuth Auth)
+        public UsersController(IUserService UserService)//, IJwtAuth Auth)
         {
             _UserService = UserService;
-            _JwtAuth = Auth;
+            //_JwtAuth = Auth;
         }
 
         [HttpPost]
         [AllowAnonymous]
         [Route("token/")]
-        public string Login(string Username, string Password)
+        public IActionResult Login(string Username, string Password)
         {
             if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Username))
-                return "";
+                return Ok("");
 
-            return _UserService.Login(Username, Password);
+            return Ok(_UserService.Login(Username, Password));
         }
 
         [HttpGet]
         [AllowAnonymous]
+        [Route("reg/")]
         public IActionResult Register(string Name, string Username, string Emailaddress, string Password)
         {
             if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Username) ||
                 string.IsNullOrEmpty(Emailaddress))
+            {
                 return Ok("IsNullOrEmpty");
+            }
 
-            return Ok(_UserService.Register(Name, Username, Emailaddress, Password).Message);
+            return Ok(_UserService.Register(Name, Username, Emailaddress, Password));
         }
 
         [HttpPost]

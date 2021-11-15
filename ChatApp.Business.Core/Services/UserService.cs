@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ChatApp.Business.Core.Validator;
 using ChatApp.Business.Core.Responses;
+using ChatApp.Domain.Models;
+using ChatApp.Business.Core.Cryptography;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -20,11 +22,19 @@ namespace ChatApp.Business.Core.Services
             _userRepository = userRepository;
         }
 
-        public string Login(string username, string password)
+        public IResponse Login(string username, string password)
         {
-            if (Exist(username, password))
-                return "Key token thingy";
-            return "";
+            var userFound = _userRepository.GetUsers().First(u => u.UserName == username);
+
+            if(userFound == null)
+                return LoginResponse.Error("User not found");
+            if (userFound.isBlocked == true)
+                return LoginResponse.Error("User is blocked");
+            if (userFound.PasswordHash != Rfc2898.Convert(password, username))
+                return LoginResponse.Error("password is wrong");
+
+
+            return LoginResponse.Successfull("generate jwt token");
         }
 
         public IResponse Register(string name, string username, string emailaddress, string password)
@@ -41,7 +51,9 @@ namespace ChatApp.Business.Core.Services
             var passwordvr = UserContentValidator.IsValidPassword(password);
             if (passwordvr.IsNotValid) return RegisterResponse.Error(passwordvr);
 
-            //stuff
+            _userRepository.InsertUser(new User() 
+            { FirstName = name, UserName = username, Email = emailaddress, PasswordHash = Rfc2898.Convert(password, username) });
+            _userRepository.Save();
 
             return RegisterResponse.Successfull();
         }

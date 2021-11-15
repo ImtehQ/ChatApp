@@ -1,5 +1,4 @@
-﻿using ChapApp.Domain.Interfaces;
-using ChatApp.Domain.Enums;
+﻿using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
