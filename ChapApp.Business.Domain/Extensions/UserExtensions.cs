@@ -13,16 +13,16 @@ namespace ChapApp.Business.Domain.Extensions
         {
             user = NewUser(id, "FirstName", "LastName", "UserName", 
                 "Email@Email.com", "", DateTime.Now, DateTime.Now, 
-                0, false, false);
+                0, false);
             return user;
         }
         private static User NewUser(int Id, string FirstName, string LastName, string UserName, 
             string Email, string PasswordHash, DateTime Created, DateTime LastUpdated, 
-            int RoleId, bool isBlocked, bool RequiresVerification)
+            int RoleId, bool isBlocked)
         {
             return new User
             {
-                Id = Id,
+                UserId = Id,
                 FirstName = FirstName,
                 LastName = LastName,
                 Email = Email,
@@ -31,7 +31,6 @@ namespace ChapApp.Business.Domain.Extensions
                 isBlocked = isBlocked,
                 LastUpdated = LastUpdated,
                 PasswordHash = PasswordHash,
-                RequiresVerification = RequiresVerification,
                 UserName = UserName
             };
         }

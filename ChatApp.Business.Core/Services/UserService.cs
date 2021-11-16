@@ -9,6 +9,8 @@ using ChatApp.Business.Core.Validator;
 using ChatApp.Business.Core.Responses;
 using ChatApp.Domain.Models;
 using ChatApp.Business.Core.Cryptography;
+using Microsoft.Extensions.Options;
+using ChatApp.Business.Core.Authentication;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -16,10 +18,14 @@ namespace ChatApp.Business.Core.Services
     public class UserService : IUserService
     {
         IUserRepository _userRepository;
+        IJWTAuthService _JWTAuthService;
+        JWTToken _JWTToken;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IOptions<JWTToken> jwt, IJWTAuthService JWTAuthService)
         {
             _userRepository = userRepository;
+            _JWTAuthService = JWTAuthService;
+            _JWTToken = jwt.Value;
         }
 
         public IResponse Login(string username, string password)
@@ -33,8 +39,9 @@ namespace ChatApp.Business.Core.Services
             if (userFound.PasswordHash != Rfc2898.Convert(password, username))
                 return LoginResponse.Error("password is wrong");
 
+            var Auth = _JWTAuthService.GetToken(userFound, _JWTToken);
 
-            return LoginResponse.Successfull("generate jwt token");
+            return LoginResponse.Successfull(Auth);
         }
 
         public IResponse Register(string name, string username, string emailaddress, string password)

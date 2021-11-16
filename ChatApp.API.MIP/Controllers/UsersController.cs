@@ -1,7 +1,15 @@
 ﻿using ChapApp.Business.Domain.Extensions;
+using ChatApp.Business.Core.Authentication;
+using ChatApp.Domain.Attributes;
+using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces;
+using ChatApp.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -10,14 +18,13 @@ namespace ChatApp.API.MIP.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        IUserService _UserService  {  get; set; }
+        IUserService _UserService { get; set; }
+        IJWTAuthService _JWTAuthService { get; set; }
 
-       // IJwtAuth _JwtAuth { get; set; }
-
-        public UsersController(IUserService UserService)//, IJwtAuth Auth)
+        public UsersController(IUserService UserService, IJWTAuthService jWTAuthService)
         {
             _UserService = UserService;
-            //_JwtAuth = Auth;
+            _JWTAuthService = jWTAuthService;
         }
 
         [HttpPost]
@@ -30,6 +37,7 @@ namespace ChatApp.API.MIP.Controllers
 
             return Ok(_UserService.Login(Username, Password));
         }
+
 
         [HttpGet]
         [AllowAnonymous]
@@ -55,9 +63,20 @@ namespace ChatApp.API.MIP.Controllers
 
         [HttpGet]
         [Route("list")]
-        public void List(string Username, string Password)
+        [Auth(AccountRoleEnum.RoleUser)]
+        [Auth(AccountRoleEnum.RoleModerator)]
+        [Auth(AccountRoleEnum.RoleUser)]
+        public IActionResult List()
         {
-
+            this.
+            AuthAttribute.IsAuthenticated = false;
+            var currentUser = HttpContext.User;
+            if (currentUser.HasClaim(c => c.Type == "UserId"))
+            {
+                int currentUserId = System.Convert.ToInt32(currentUser.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
+                return Ok(currentUserId);
+            }
+            return Ok("Meh");
         }
 
         [HttpGet]

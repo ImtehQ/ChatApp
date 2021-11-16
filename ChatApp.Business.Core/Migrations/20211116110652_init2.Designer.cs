@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Business.Core.Migrations
 {
     [DbContext(typeof(ChatAppContext))]
-    [Migration("20211112123709_firstInt")]
-    partial class firstInt
+    [Migration("20211116110652_init2")]
+    partial class init2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,13 +23,10 @@ namespace ChatApp.Business.Core.Migrations
 
             modelBuilder.Entity("ChatApp.Domain.Models.Group", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("GroupId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("Admin")
-                        .HasColumnType("int");
 
                     b.Property<int>("MaxUsers")
                         .HasColumnType("int");
@@ -43,14 +40,41 @@ namespace ChatApp.Business.Core.Migrations
                     b.Property<int>("VisibilityType")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.Property<int>("type")
+                        .HasColumnType("int");
+
+                    b.HasKey("GroupId");
 
                     b.ToTable("Groups");
                 });
 
-            modelBuilder.Entity("ChatApp.Domain.Models.Message", b =>
+            modelBuilder.Entity("ChatApp.Domain.Models.GroupUsers", b =>
                 {
                     b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AccountRole")
+                        .HasColumnType("int");
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId")
+                        .IsUnique();
+
+                    b.ToTable("GroupUsers");
+                });
+
+            modelBuilder.Entity("ChatApp.Domain.Models.Message", b =>
+                {
+                    b.Property<int>("MessageId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -61,16 +85,21 @@ namespace ChatApp.Business.Core.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TypeId")
+                    b.Property<int?>("GroupId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("Read")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("Received")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<int>("type")
-                        .HasColumnType("int");
+                    b.HasKey("MessageId");
 
-                    b.HasKey("Id");
+                    b.HasIndex("GroupId");
 
                     b.HasIndex("UserId");
 
@@ -79,7 +108,7 @@ namespace ChatApp.Business.Core.Migrations
 
             modelBuilder.Entity("ChatApp.Domain.Models.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -92,9 +121,6 @@ namespace ChatApp.Business.Core.Migrations
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("GroupId")
-                        .HasColumnType("int");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -117,35 +143,38 @@ namespace ChatApp.Business.Core.Migrations
                     b.Property<bool>("isBlocked")
                         .HasColumnType("bit");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("GroupId");
+                    b.HasKey("UserId");
 
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("ChatApp.Domain.Models.Message", b =>
-                {
-                    b.HasOne("ChatApp.Domain.Models.User", null)
-                        .WithMany("messages")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("ChatApp.Domain.Models.User", b =>
+            modelBuilder.Entity("ChatApp.Domain.Models.GroupUsers", b =>
                 {
                     b.HasOne("ChatApp.Domain.Models.Group", null)
-                        .WithMany("Moderators")
+                        .WithOne("Users")
+                        .HasForeignKey("ChatApp.Domain.Models.GroupUsers", "GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ChatApp.Domain.Models.Message", b =>
+                {
+                    b.HasOne("ChatApp.Domain.Models.Group", null)
+                        .WithMany("messageIds")
                         .HasForeignKey("GroupId");
+
+                    b.HasOne("ChatApp.Domain.Models.User", "SenderId")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("SenderId");
                 });
 
             modelBuilder.Entity("ChatApp.Domain.Models.Group", b =>
                 {
-                    b.Navigation("Moderators");
-                });
+                    b.Navigation("messageIds");
 
-            modelBuilder.Entity("ChatApp.Domain.Models.User", b =>
-                {
-                    b.Navigation("messages");
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

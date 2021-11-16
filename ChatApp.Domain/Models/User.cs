@@ -1,9 +1,10 @@
-﻿using System;
+﻿using ChatApp.Domain.Enums;
+using System;
 namespace ChatApp.Domain.Models
 {
     public class User
     {
-        public int Id {  get; set; }
+        public int UserId {  get; set; }
         public string FirstName {  get; set; }
         public string LastName { get; set; }
         public string UserName { get; set; }
@@ -11,9 +12,7 @@ namespace ChatApp.Domain.Models
         public string PasswordHash {  get; set; }
         public DateTime Created {  get; set; }
         public DateTime LastUpdated { get; set; }
-        public int RoleId {  get; set; }
+        public AccountRoleEnum Role {  get; set; }
         public bool isBlocked {  get; set; }
-        public bool RequiresVerification { get; set; }
-        public Message[] messages {  get; set; }
     }
 }

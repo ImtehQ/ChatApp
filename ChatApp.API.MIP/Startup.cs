@@ -1,7 +1,9 @@
 using ChapApp.Business.Core.Repositorys;
+using ChatApp.Business.Core.Authentication;
 using ChatApp.Business.Core.DbContexts;
 using ChatApp.Business.Core.Services;
 using ChatApp.Domain.Interfaces;
+using ChatApp.Domain.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,7 +11,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using System;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ChatApp.API.MIP
 {
@@ -25,12 +31,28 @@ namespace ChatApp.API.MIP
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
+            services.Configure<JWTToken>(Configuration.GetSection("JWT"));
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(o =>
+            {
+                o.RequireHttpsMetadata = false;
+                o.SaveToken = false;
+                o.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.Audience = "https://localhost:5001/";
-                    options.Authority = "https://localhost:5000/";
-                });
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero,
+                    ValidIssuer = Configuration["JWT:Issuer"],
+                    ValidAudience = Configuration["JWT:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Key"]))
+                };
+            });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -40,6 +62,8 @@ namespace ChatApp.API.MIP
 
             services.AddDbContext<ChatAppContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddScoped<IJWTAuthService, JWTAuthService>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IGroupService, GroupService>();
