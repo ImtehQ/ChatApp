@@ -28,6 +28,11 @@ namespace ChatApp.Business.Core.Services
             _JWTToken = jwt.Value;
         }
 
+        public User GetUserById(int Id)
+        {
+            return _userRepository.GetUserByID(Id);
+        }
+
         public IResponse Login(string username, string password)
         {
             var userFound = _userRepository.GetUsers().First(u => u.UserName == username);

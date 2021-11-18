@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ChatApp.Business.Core.Migrations
 {
-    public partial class init : Migration
+    public partial class usermodelUpdate1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,8 +17,7 @@ namespace ChatApp.Business.Core.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MaxUsers = table.Column<int>(type: "int", nullable: false),
                     VisibilityType = table.Column<int>(type: "int", nullable: false),
-                    Password = table.Column<int>(type: "int", nullable: false),
-                    AdminId = table.Column<int>(type: "int", nullable: false)
+                    Password = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,9 +37,8 @@ namespace ChatApp.Business.Core.Migrations
                     PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    isBlocked = table.Column<bool>(type: "bit", nullable: false),
-                    RequiresVerification = table.Column<bool>(type: "bit", nullable: false)
+                    Role = table.Column<int>(type: "int", nullable: false),
+                    isBlocked = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -48,26 +46,23 @@ namespace ChatApp.Business.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GroupUser",
+                name: "GroupUsers",
                 columns: table => new
                 {
-                    ModeratorIdsUserId = table.Column<int>(type: "int", nullable: false),
-                    groupIdsGroupId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GroupId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    AccountRole = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GroupUser", x => new { x.ModeratorIdsUserId, x.groupIdsGroupId });
+                    table.PrimaryKey("PK_GroupUsers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GroupUser_Groups_groupIdsGroupId",
-                        column: x => x.groupIdsGroupId,
+                        name: "FK_GroupUsers_Groups_GroupId",
+                        column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "GroupId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_GroupUser_Users_ModeratorIdsUserId",
-                        column: x => x.ModeratorIdsUserId,
-                        principalTable: "Users",
-                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -102,9 +97,10 @@ namespace ChatApp.Business.Core.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_GroupUser_groupIdsGroupId",
-                table: "GroupUser",
-                column: "groupIdsGroupId");
+                name: "IX_GroupUsers_GroupId",
+                table: "GroupUsers",
+                column: "GroupId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_GroupId",
@@ -120,7 +116,7 @@ namespace ChatApp.Business.Core.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "GroupUser");
+                name: "GroupUsers");
 
             migrationBuilder.DropTable(
                 name: "Messages");

@@ -129,7 +129,7 @@ namespace ChatApp.Business.Core.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("RoleId")
+                    b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")

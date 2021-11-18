@@ -1,19 +1,13 @@
-﻿using ChapApp.Business.Domain.Extensions;
-using ChatApp.Business.Core.Authentication;
-using ChatApp.Domain.Attributes;
+﻿using ChatApp.Business.Core.Authentication;
 using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces;
-using ChatApp.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.Linq;
-using System.Threading.Tasks;
+using AuthorizeAttribute = ChatApp.Business.Core.Authentication.AuthorizeAttribute;
 
 namespace ChatApp.API.MIP.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -63,13 +57,11 @@ namespace ChatApp.API.MIP.Controllers
 
         [HttpGet]
         [Route("list")]
-        [Auth(AccountRoleEnum.RoleUser)]
-        [Auth(AccountRoleEnum.RoleModerator)]
-        [Auth(AccountRoleEnum.RoleUser)]
+        [Authorize(AccountRoleEnum.RoleUser)]
+        [Authorize(AccountRoleEnum.RoleModerator)]
+        [Authorize(AccountRoleEnum.RoleUser)]
         public IActionResult List()
         {
-            this.
-            AuthAttribute.IsAuthenticated = false;
             var currentUser = HttpContext.User;
             if (currentUser.HasClaim(c => c.Type == "UserId"))
             {
@@ -81,6 +73,9 @@ namespace ChatApp.API.MIP.Controllers
 
         [HttpGet]
         [Route("block/{userId}")]
+        [Authorize(AccountRoleEnum.RoleUser)]
+        [Authorize(AccountRoleEnum.RoleModerator)]
+        [Authorize(AccountRoleEnum.RoleUser)]
         public void Block(int userId)
         {
 

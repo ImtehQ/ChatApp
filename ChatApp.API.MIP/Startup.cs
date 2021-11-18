@@ -31,26 +31,24 @@ namespace ChatApp.API.MIP
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<JWTToken>(Configuration.GetSection("JWT"));
 
-            services.AddAuthentication(options =>
+
+            services.AddAuthentication(option =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(o =>
+                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+            }).AddJwtBearer(options =>
             {
-                o.RequireHttpsMetadata = false;
-                o.SaveToken = false;
-                o.TokenValidationParameters = new TokenValidationParameters
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuerSigningKey = true,
                     ValidateIssuer = true,
                     ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero,
-                    ValidIssuer = Configuration["JWT:Issuer"],
-                    ValidAudience = Configuration["JWT:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Key"]))
+                    ValidateLifetime = false,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])) //Configuration["JwtToken:SecretKey"]
                 };
             });
 
@@ -61,17 +59,18 @@ namespace ChatApp.API.MIP
             });
 
             services.AddDbContext<ChatAppContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<IJWTAuthService, JWTAuthService>();
+            services.AddTransient<IUserService, UserService>();
 
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IMessageService, MessageService>();
 
             services.AddScoped<IUserRepository, EFUserRepository>();
             services.AddScoped<IGroupRepository, EFGroupRepository>();
             services.AddScoped<IMessageRepository, EFMessageRepository>();
+
+            services.AddScoped<IJWTAuthService, JWTAuthService>();
 
         }
 
@@ -92,6 +91,8 @@ namespace ChatApp.API.MIP
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            app.UseMiddleware<JWTMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

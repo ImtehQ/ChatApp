@@ -12,13 +12,17 @@ namespace ChapApp.Business.Domain.Extensions
         public static User New(this User user, int id)
         {
             user = NewUser(id, "FirstName", "LastName", "UserName", 
-                "Email@Email.com", "", DateTime.Now, DateTime.Now, 
-                0, false);
+                "Email@Email.com", "", DateTime.Now, DateTime.Now, false);
             return user;
+        }
+        public static User New(int id)
+        {
+            return NewUser(id, "FirstName", "LastName", "UserName",
+                "Email@Email.com", "", DateTime.Now, DateTime.Now, false);
         }
         private static User NewUser(int Id, string FirstName, string LastName, string UserName, 
             string Email, string PasswordHash, DateTime Created, DateTime LastUpdated, 
-            int RoleId, bool isBlocked)
+            bool isBlocked)
         {
             return new User
             {
@@ -26,7 +30,6 @@ namespace ChapApp.Business.Domain.Extensions
                 FirstName = FirstName,
                 LastName = LastName,
                 Email = Email,
-                RoleId = RoleId,
                 Created = Created,
                 isBlocked = isBlocked,
                 LastUpdated = LastUpdated,

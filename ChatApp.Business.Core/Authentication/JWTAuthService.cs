@@ -1,4 +1,5 @@
 ﻿using ChatApp.Domain.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -12,6 +13,13 @@ namespace ChatApp.Business.Core.Authentication
     {
         //https://codewithmukesh.com/blog/aspnet-core-api-with-jwt-authentication/
         //https://codewithmukesh.com/blog/refresh-tokens-in-aspnet-core/
+
+        private readonly IConfiguration _configuration;
+
+        public JWTAuthService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
 
         public AuthenticationModel GetToken(User user, JWTToken _jwt)
         {
@@ -30,13 +38,13 @@ namespace ChatApp.Business.Core.Authentication
                 new Claim("UserId", user.UserId.ToString()),
             };
 
-            var symmetricSecurityKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
+            var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["Jwt:key"]));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
             var jwtSecurityToken = new JwtSecurityToken(
-                issuer: _jwt.Issuer,
-                audience: _jwt.Audience,
+                issuer: _configuration["Jwt:Issuer"],
+                audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
+                expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_configuration["Jwt:DurationInMinutes"])),
                 signingCredentials: signingCredentials);
             return jwtSecurityToken;
         }

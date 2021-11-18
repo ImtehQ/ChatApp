@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ChatApp.Business.Core.Migrations
 {
     [DbContext(typeof(ChatAppContext))]
-    [Migration("20211116110652_init2")]
-    partial class init2
+    [Migration("20211118131410_usermodelUpdate1")]
+    partial class usermodelUpdate1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -131,10 +131,7 @@ namespace ChatApp.Business.Core.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("RequiresVerification")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("RoleId")
+                    b.Property<int>("Role")
                         .HasColumnType("int");
 
                     b.Property<string>("UserName")
