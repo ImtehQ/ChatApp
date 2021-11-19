@@ -3,6 +3,8 @@ using ChatApp.Business.Core.Authentication;
 using ChatApp.Business.Core.DbContexts;
 using ChatApp.Business.Core.Services;
 using ChatApp.Domain.Interfaces;
+using ChatApp.Domain.Interfaces.Repositorys;
+using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ChatApp.Business.Core.Repositorys;
 using System;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,9 +66,11 @@ namespace ChatApp.API.MIP
 
             services.AddTransient<IUserService, UserService>();
 
+            services.AddScoped<IGroupUserService, GroupUserService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IMessageService, MessageService>();
 
+            services.AddScoped<IGroupUserRepository, EFGroupUserRepository>();
             services.AddScoped<IUserRepository, EFUserRepository>();
             services.AddScoped<IGroupRepository, EFGroupRepository>();
             services.AddScoped<IMessageRepository, EFMessageRepository>();

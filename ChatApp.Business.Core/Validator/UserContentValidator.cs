@@ -1,4 +1,5 @@
 ﻿using ChatApp.Business.Core.Responses;
+using ChatApp.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,28 +12,28 @@ namespace ChatApp.Business.Core.Validator
 {
     public static class UserContentValidator
     {
-        public static ValidatorResponse IsValidName(string name)
+        public static Response RegisterName(string name)
         {
             if (name.Length <= 1)
-                return ValidatorResponse.Error("Name is to short");
-            return ValidatorResponse.Successfull();
+                return Response.Error(ResponseCode.ValidatorNameInvalid);
+            return Response.Successfull();
         }
 
-        public static ValidatorResponse IsValidUsername(string username)
+        public static Response RegisterUsername(string username)
         { 
             if (username.Length < 8)
-                return ValidatorResponse.Error("Username is to short");
-            return ValidatorResponse.Successfull();
+                return Response.Error(ResponseCode.ValidatorUserNameInvalid);
+            return Response.Successfull();
         }
 
-        public static ValidatorResponse IsValidPassword(string password)
+        public static Response RegisterPassword(string password)
         {
             if (password.Length < 8)
-                return ValidatorResponse.Error("Password is to short");
-            return ValidatorResponse.Successfull();
+                return Response.Error(ResponseCode.ValidatorPasswordInvalid);
+            return Response.Successfull();
         }
 
-        public static ValidatorResponse IsValidEmailAddress(string email)
+        public static Response RegisterEmailAddress(string email)
         {
             try
             {
@@ -54,11 +55,11 @@ namespace ChatApp.Business.Core.Validator
             }
             catch (RegexMatchTimeoutException e)
             {
-                return ValidatorResponse.Error(e.Message);
+                return Response.Error(ResponseCode.ValidatorEmailInvalid, e.Message);
             }
             catch (ArgumentException e)
             {
-                return ValidatorResponse.Error(e.Message);
+                return Response.Error(ResponseCode.ValidatorEmailInvalid, e.Message);
             }
 
             try
@@ -66,15 +67,15 @@ namespace ChatApp.Business.Core.Validator
                 if (Regex.IsMatch(email,
                     @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
                     RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250)) == true)
-                    return ValidatorResponse.Successfull();
+                    return Response.Successfull();
 
             }
             catch (RegexMatchTimeoutException)
             {
-                return ValidatorResponse.Error("RegexMatchTimeoutException");
+                return Response.Error(ResponseCode.ValidatorEmailInvalid ,"RegexMatchTimeoutException");
             }
 
-            return ValidatorResponse.Error("Not valid email address");
+            return Response.Error(ResponseCode.ValidatorEmailInvalid, "Not valid email address");
         }
     }
 }

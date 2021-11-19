@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ChatApp.Domain.Models
 {
-    public class GroupUsers
+    public class GroupUser
     {
         public int Id { get; set; }
-        public int GroupId { get; set; }
-        public int UserId { get; set; }
+        public Group Group { get; set; }
+        public User User { get; set; }
         public AccountRoleEnum AccountRole { get; set; }
     }
 }

@@ -1,16 +1,30 @@
-﻿using ChatApp.Domain.Interfaces;
-using System;
+﻿using ChatApp.Business.Domain.Responses;
+using ChatApp.Domain.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatApp.Business.Core.Responses
 {
-    public abstract class Response : IResponse
+    public class Response : IResponse
     {
-        public bool IsValid { get; init; }
-        public bool IsNotValid { get { return !IsValid; } }
-        public string Message { get; init; }
+        public bool Valid { get; init; }
+        public ResponseCode Code { get; set; }
+        public List<Response> Responses { get; set; }
+        public object Content { get; init; }
+
+        public List<int> ToCodes()
+        {
+            List<int> codes = new List<int>();
+            codes.AddRange(Code.ToCodes());
+            for (int i = 0; i < Responses.Count; i++)
+            {
+                codes.AddRange(Responses[i].ToCodes());
+            }
+            return codes; 
+        }
+
+        public static Response Successfull()
+        {
+            return new Response() { Valid = true, Responses = null, Content = null, Code = null };
+        }
     }
 }

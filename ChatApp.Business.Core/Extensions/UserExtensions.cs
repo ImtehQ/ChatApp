@@ -37,5 +37,6 @@ namespace ChapApp.Business.Domain.Extensions
                 UserName = UserName
             };
         }
+
     }
 }

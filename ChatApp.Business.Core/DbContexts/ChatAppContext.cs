@@ -13,16 +13,13 @@ namespace ChatApp.Business.Core.DbContexts
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupUser> GroupUsers { get; set; }
         public DbSet<Message> Messages { get; set; }
 
         public ChatAppContext(DbContextOptions<ChatAppContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //for (int i = 0; i < 5; i++)
-            //{
-            //    modelBuilder.Entity<User>().HasData(UserExtensions.New(i));
-            //}
 
         }
     }

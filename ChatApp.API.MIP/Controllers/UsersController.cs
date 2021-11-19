@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using AuthorizeAttribute = ChatApp.Business.Core.Authentication.AuthorizeAttribute;
-
+using ChatApp.Domain.Interfaces.Services;
 namespace ChatApp.API.MIP.Controllers
 {
     [ApiController]
@@ -29,7 +29,7 @@ namespace ChatApp.API.MIP.Controllers
             if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Username))
                 return Ok("");
 
-            return Ok(_UserService.Login(Username, Password));
+            return Ok(_UserService.Login(Username, Password).ToCodes());
         }
 
 
@@ -44,7 +44,7 @@ namespace ChatApp.API.MIP.Controllers
                 return Ok("IsNullOrEmpty");
             }
 
-            return Ok(_UserService.Register(Name, Username, Emailaddress, Password));
+            return Ok(_UserService.Register(Name, Username, Emailaddress, Password).ToCodes());
         }
 
         [HttpPost]
@@ -55,27 +55,11 @@ namespace ChatApp.API.MIP.Controllers
 
 
 
-        [HttpGet]
-        [Route("list")]
-        [Authorize(AccountRoleEnum.RoleUser)]
-        [Authorize(AccountRoleEnum.RoleModerator)]
-        [Authorize(AccountRoleEnum.RoleUser)]
-        public IActionResult List()
-        {
-            var currentUser = HttpContext.User;
-            if (currentUser.HasClaim(c => c.Type == "UserId"))
-            {
-                int currentUserId = System.Convert.ToInt32(currentUser.Claims.FirstOrDefault(c => c.Type == "UserId").Value);
-                return Ok(currentUserId);
-            }
-            return Ok("Meh");
-        }
+
 
         [HttpGet]
         [Route("block/{userId}")]
-        [Authorize(AccountRoleEnum.RoleUser)]
         [Authorize(AccountRoleEnum.RoleModerator)]
-        [Authorize(AccountRoleEnum.RoleUser)]
         public void Block(int userId)
         {
 

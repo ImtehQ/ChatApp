@@ -1,5 +1,7 @@
 ﻿using ChapApp.Business.Domain.Interfaces;
+using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces;
+using ChatApp.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +12,28 @@ namespace ChatApp.Business.Core.Services
 {
     public class GroupService : IGroupService
     {
-        IGroupRepository _groupRepository;
+        IGroupRepository _GroupRepository;
 
         public GroupService(IGroupRepository groupRepository)
         {
-            _groupRepository = groupRepository;
+            _GroupRepository = groupRepository;
+        }
+
+        public Group Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
+        {
+            Group group = new Group()
+            {
+                Name = Name,
+                MaxUsers = MaxUsers,
+                VisibilityType = Visibility,
+                Password = Password,
+                type = GroupType
+            };
+
+            _GroupRepository.InsertGroup(group);
+            _GroupRepository.Save();
+
+            return group;
         }
     }
 }

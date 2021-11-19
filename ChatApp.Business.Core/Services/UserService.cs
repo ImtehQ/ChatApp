@@ -1,16 +1,13 @@
-﻿using ChapApp.Business.Domain.Interfaces;
-using ChatApp.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using ChatApp.Domain.Interfaces;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ChatApp.Business.Core.Validator;
 using ChatApp.Business.Core.Responses;
 using ChatApp.Domain.Models;
 using ChatApp.Business.Core.Cryptography;
 using Microsoft.Extensions.Options;
 using ChatApp.Business.Core.Authentication;
+using ChatApp.Domain.Interfaces.Services;
+using ChatApp.Domain.Enums;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -35,39 +32,51 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse Login(string username, string password)
         {
+            Response R = ResponseBuilder.new(Layer.Service);
+
+            R.Error(Login)
+
+            
+            Response r = new Response() { Code = new Domain.Responses.ResponseCode() { LayerCode = ChatApp.Domain.Enums.ResponseCodes.ResponseLayerCode.Service } }
             var userFound = _userRepository.GetUsers().First(u => u.UserName == username);
 
             if(userFound == null)
-                return LoginResponse.Error("User not found");
+                return r.Error(r, ResponseCode.LoginUserNotFound);
             if (userFound.isBlocked == true)
-                return LoginResponse.Error("User is blocked");
+                return Response.Error(ResponseCode.LoginUserIsBlocked);
             if (userFound.PasswordHash != Rfc2898.Convert(password, username))
-                return LoginResponse.Error("password is wrong");
+                return Response.Error(ResponseCode.LoginUserPasswordWrong);
 
             var Auth = _JWTAuthService.GetToken(userFound, _JWTToken);
 
-            return LoginResponse.Successfull(Auth);
+            return Response.Successfull(Auth);
         }
 
         public IResponse Register(string name, string username, string emailaddress, string password)
         {
-            var namevr = UserContentValidator.IsValidName(name);
-            if (namevr.IsNotValid) return RegisterResponse.Error(namevr);
+            var nameValidator = UserContentValidator.IsValidName(name);
+            if (nameValidator.Valid == false) return Response.Error(nameValidator, 
+                ResponseCode.RegisterNameInvalid);
 
-            var usernamevr = UserContentValidator.IsValidUsername(username);
-            if (usernamevr.IsNotValid) return RegisterResponse.Error(usernamevr);
+            var usernameValidator = UserContentValidator.IsValidUsername(username);
+            if (usernameValidator.Valid == false) return Response.Error(usernameValidator, 
+                ResponseCode.RegisterUserNameInvalid);
 
-            var emailvr = UserContentValidator.IsValidEmailAddress(emailaddress);
-            if (emailvr.IsNotValid) return RegisterResponse.Error(emailvr);
+            var emailValidator = UserContentValidator.IsValidEmailAddress(emailaddress);
+            if (emailValidator.Valid == false) return Response.Error(emailValidator, 
+                ResponseCode.RegisterEmailInvalid);
 
-            var passwordvr = UserContentValidator.IsValidPassword(password);
-            if (passwordvr.IsNotValid) return RegisterResponse.Error(passwordvr);
+            var passwordValidator = UserContentValidator.IsValidPassword(password);
+            if (passwordValidator.Valid == false) return Response.Error(passwordValidator, 
+                ResponseCode.RegisterPasswordInvalid);
+
+            //===================================================================
 
             _userRepository.InsertUser(new User() 
             { FirstName = name, UserName = username, Email = emailaddress, PasswordHash = Rfc2898.Convert(password, username) });
             _userRepository.Save();
 
-            return RegisterResponse.Successfull();
+            return Response.Successfull();
         }
 
         private bool Exist(string username, string password)
