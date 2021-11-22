@@ -7,34 +7,43 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using ChatApp.Domain.Enums.ResponseCodes;
+using ChatApp.Domain.Interfaces;
 
 namespace ChatApp.Business.Core.Validator
 {
     public static class UserContentValidator
     {
-        public static Response RegisterName(string name)
+        public static IResponse RegisterName(string name)
         {
+            IResponse response = new Response(ResponseMethodCode.Register, ResponseLayerCode.Validator, name);
+
             if (name.Length <= 1)
-                return Response.Error(ResponseCode.ValidatorNameInvalid);
-            return Response.Successfull();
+                return response.Failed(System.Net.HttpStatusCode.BadRequest, "Length <= 1");
+            return response.Successfull();
         }
 
-        public static Response RegisterUsername(string username)
-        { 
+        public static IResponse RegisterUsername(string username)
+        {
+            IResponse response = new Response(ResponseMethodCode.Register, ResponseLayerCode.Validator, username);
+
             if (username.Length < 8)
-                return Response.Error(ResponseCode.ValidatorUserNameInvalid);
-            return Response.Successfull();
+                return response.Failed(System.Net.HttpStatusCode.BadRequest, "Length <= 1");
+            return response.Successfull();
         }
 
-        public static Response RegisterPassword(string password)
+        public static IResponse RegisterPassword(string password)
         {
+            IResponse response = new Response(ResponseMethodCode.Register, ResponseLayerCode.Validator, password);
+
             if (password.Length < 8)
-                return Response.Error(ResponseCode.ValidatorPasswordInvalid);
-            return Response.Successfull();
+                return response.Failed(System.Net.HttpStatusCode.BadRequest, "Length <= 1");
+            return response.Successfull();
         }
 
-        public static Response RegisterEmailAddress(string email)
+        public static IResponse RegisterEmailAddress(string email)
         {
+            IResponse response = new Response(ResponseMethodCode.Register, ResponseLayerCode.Validator, email);
             try
             {
                 // Normalize the domain
@@ -55,11 +64,11 @@ namespace ChatApp.Business.Core.Validator
             }
             catch (RegexMatchTimeoutException e)
             {
-                return Response.Error(ResponseCode.ValidatorEmailInvalid, e.Message);
+                return response.Failed(System.Net.HttpStatusCode.BadRequest, e.Message);
             }
             catch (ArgumentException e)
             {
-                return Response.Error(ResponseCode.ValidatorEmailInvalid, e.Message);
+                return response.Failed(System.Net.HttpStatusCode.BadRequest, e.Message);
             }
 
             try
@@ -67,15 +76,15 @@ namespace ChatApp.Business.Core.Validator
                 if (Regex.IsMatch(email,
                     @"^[^@\s]+@[^@\s]+\.[^@\s]+$",
                     RegexOptions.IgnoreCase, TimeSpan.FromMilliseconds(250)) == true)
-                    return Response.Successfull();
+                    return response.Successfull(System.Net.HttpStatusCode.Accepted);
 
             }
             catch (RegexMatchTimeoutException)
             {
-                return Response.Error(ResponseCode.ValidatorEmailInvalid ,"RegexMatchTimeoutException");
+                return response.Failed(System.Net.HttpStatusCode.BadRequest, "RegexMatchTimeoutException");
             }
 
-            return Response.Error(ResponseCode.ValidatorEmailInvalid, "Not valid email address");
+            return response.Failed(System.Net.HttpStatusCode.BadRequest, "RegexMatchTimeoutException");
         }
     }
 }

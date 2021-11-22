@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ChatApp.Domain.Enums.ResponseCodes;
+using ChatApp.Business.Domain.Responses;
 
 namespace ChatApp.Business.Core.Validator
 {
@@ -13,16 +15,18 @@ namespace ChatApp.Business.Core.Validator
     {
         public static IResponse RegisterGroupName(string value)
         {
+            IResponse response = new Response(ResponseMethodCode.Register, ResponseLayerCode.Validator, value);
             if (value.Length <= 1)
-                return Response.Error(ResponseCode.ValidatorNameInvalid);
-            return Response.Successfull();
+                return response.Failed(System.Net.HttpStatusCode.BadGateway, "Length <= 1");
+            return response.Successfull(System.Net.HttpStatusCode.Accepted);
         }
 
         public static IResponse RegisterGroupPassword(string value)
         {
+            IResponse response = new Response(ResponseMethodCode.Register, ResponseLayerCode.Validator, value);
             if (value.Length <= 1)
-                return Response.Error(ResponseCode.ValidatorNameInvalid);
-            return Response.Successfull();
+                return response.Failed(System.Net.HttpStatusCode.BadGateway, "Length <= 1");
+            return response.Successfull(System.Net.HttpStatusCode.Accepted);
         }
     }
 }

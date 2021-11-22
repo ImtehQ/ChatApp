@@ -43,7 +43,9 @@ namespace ChatApp.API.MIP.Controllers
         [HttpPost]
         [Route("groups")]
         [Authorize(AccountRoleEnum.RoleUser)]
-        public IActionResult Register(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
+        public IActionResult Register(string Name, string Password, int MaxUsers = 0, 
+            GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, 
+            GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
             User user = _UserService.GetUserById(HttpContext.User.GetUserID());
             Group group = _GroupService.Create(Name, Password, MaxUsers, Visibility, GroupType);

@@ -8,6 +8,11 @@ using Microsoft.Extensions.Options;
 using ChatApp.Business.Core.Authentication;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Enums;
+using ChatApp.Domain.Enums.ResponseCodes;
+using System;
+using RandomNameGeneratorLibrary;
+using System.Collections.Generic;
+using System.Net;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -32,43 +37,42 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse Login(string username, string password)
         {
-            Response R = ResponseBuilder.new(Layer.Service);
-
-            R.Error(Login)
-
+            Response response = new Response(ResponseMethodCode.Login, ResponseLayerCode.Service,
+                new object[] { username, password });
             
-            Response r = new Response() { Code = new Domain.Responses.ResponseCode() { LayerCode = ChatApp.Domain.Enums.ResponseCodes.ResponseLayerCode.Service } }
             var userFound = _userRepository.GetUsers().First(u => u.UserName == username);
 
-            if(userFound == null)
-                return r.Error(r, ResponseCode.LoginUserNotFound);
+            if (userFound == null)
+                return response.Failed(System.Net.HttpStatusCode.NotFound, username);
+
             if (userFound.isBlocked == true)
-                return Response.Error(ResponseCode.LoginUserIsBlocked);
+                return response.Failed(System.Net.HttpStatusCode.Unauthorized, username);
+
             if (userFound.PasswordHash != Rfc2898.Convert(password, username))
-                return Response.Error(ResponseCode.LoginUserPasswordWrong);
+                return response.Failed(System.Net.HttpStatusCode.Unauthorized, username);
 
             var Auth = _JWTAuthService.GetToken(userFound, _JWTToken);
 
-            return Response.Successfull(Auth);
+            return response.Successfull(Auth);
         }
 
         public IResponse Register(string name, string username, string emailaddress, string password)
         {
-            var nameValidator = UserContentValidator.IsValidName(name);
-            if (nameValidator.Valid == false) return Response.Error(nameValidator, 
-                ResponseCode.RegisterNameInvalid);
+            Response response = new Response(
+                ResponseMethodCode.Register, ResponseLayerCode.Service,
+                new object[] { name, username, emailaddress, password });
 
-            var usernameValidator = UserContentValidator.IsValidUsername(username);
-            if (usernameValidator.Valid == false) return Response.Error(usernameValidator, 
-                ResponseCode.RegisterUserNameInvalid);
+            var nameValidator = UserContentValidator.RegisterName(name);
+            if (nameValidator.Valid == false) return nameValidator;
 
-            var emailValidator = UserContentValidator.IsValidEmailAddress(emailaddress);
-            if (emailValidator.Valid == false) return Response.Error(emailValidator, 
-                ResponseCode.RegisterEmailInvalid);
+            var usernameValidator = UserContentValidator.RegisterUsername(username);
+            if (usernameValidator.Valid == false) return usernameValidator;
 
-            var passwordValidator = UserContentValidator.IsValidPassword(password);
-            if (passwordValidator.Valid == false) return Response.Error(passwordValidator, 
-                ResponseCode.RegisterPasswordInvalid);
+            var emailValidator = UserContentValidator.RegisterEmailAddress(emailaddress);
+            if (emailValidator.Valid == false) return emailValidator;
+
+            var passwordValidator = UserContentValidator.RegisterPassword(password);
+            if (passwordValidator.Valid == false) return passwordValidator;
 
             //===================================================================
 
@@ -76,7 +80,7 @@ namespace ChatApp.Business.Core.Services
             { FirstName = name, UserName = username, Email = emailaddress, PasswordHash = Rfc2898.Convert(password, username) });
             _userRepository.Save();
 
-            return Response.Successfull();
+            return response.Successfull();
         }
 
         private bool Exist(string username, string password)
@@ -84,6 +88,21 @@ namespace ChatApp.Business.Core.Services
             return _userRepository.GetUsers().Any(user =>
             user.UserName == username &&
             user.PasswordHash == password) ? true : false;
+        }
+
+        public IResponse BlockUserById(int userId)
+        {
+            IResponse response = new Response(ResponseMethodCode.Block, ResponseLayerCode.Service, userId);
+
+            User user = _userRepository.GetUserByID(userId);
+            if (user == null)
+            {
+                return response.Failed(HttpStatusCode.NotFound);
+            }
+
+            user.isBlocked = true;
+            _userRepository.UpdateUser(user);
+            return response.Successfull(HttpStatusCode.OK);
         }
     }
 }

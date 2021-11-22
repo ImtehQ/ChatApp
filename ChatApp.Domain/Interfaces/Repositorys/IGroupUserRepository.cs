@@ -10,7 +10,7 @@ namespace ChatApp.Domain.Interfaces.Repositorys
 {
     public interface IGroupUserRepository
     {
-        List<GroupUser> GetGroupUsersByUserId(int userId);
+        IEnumerable<GroupUser> GetGroupUsers();
         void Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup);
         void Save();
     }

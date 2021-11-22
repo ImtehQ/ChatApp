@@ -10,6 +10,7 @@ namespace ChatApp.Domain.Enums.ResponseCodes
     {
         Api = 0,
         Service = 1,
-        Repo = 2
+        Repo = 2,
+        Validator = 3
     }
 }

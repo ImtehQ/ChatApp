@@ -8,8 +8,9 @@ namespace ChatApp.Domain.Enums.ResponseCodes
 {
     public enum ResponseMethodCode
     {
-        Register,
-        Login,
-        Block,
+        Register = 0,
+        Login = 1,
+        Block = 2,
+        List = 3,
     }
 }

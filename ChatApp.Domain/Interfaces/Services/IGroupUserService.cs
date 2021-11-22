@@ -10,6 +10,7 @@ namespace ChatApp.Domain.Interfaces.Services
 {
     public interface IGroupUserService
     {
+        IResponse GetAllUsersByGroupType(User user, GroupTypeEnum groupType);
         List<Group> GetGroupsByUser(User user);
         void Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup);
     }

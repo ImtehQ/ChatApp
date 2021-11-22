@@ -2,6 +2,7 @@
 using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces.Repositorys;
 using ChatApp.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,9 +20,9 @@ namespace ChatApp.Business.Core.Repositorys
             this.context = context;
         }
 
-        public List<GroupUser> GetGroupUsersByUserId(int userId)
+        public IEnumerable<GroupUser> GetGroupUsers()
         {
-            return context.GroupUsers.Where(x => x.User.UserId == userId).ToList();
+            return context.GroupUsers.Include(g => g.Group).ToList();
         }
 
         public void Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup)
