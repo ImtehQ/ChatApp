@@ -22,7 +22,7 @@ namespace ChapApp.Business.Core.Repositorys
 
         public IEnumerable<Message> GetMessages()
         {
-            return context.Messages.ToList();
+            return context.Messages;
         }
 
         public Message GetMessageByID(int id)

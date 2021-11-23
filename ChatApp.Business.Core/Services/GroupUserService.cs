@@ -57,5 +57,25 @@ namespace ChatApp.Business.Core.Services
             else
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
         }
+
+        public IResponse Join(Group group, User user, AccountRoleEnum accountRole)
+        {
+            IResponse response = new Response(ResponseMethodCode.Join, ResponseLayerCode.Service, 
+                new object[] { group, user, accountRole });
+
+            _GroupUserRepository.Insert(user, group, accountRole);
+
+            return response.Successfull();
+        }
+
+        public void RemoveGroup(Group group)
+        {
+            _GroupUserRepository.DeleteGroupUser(group);
+        }
+
+        public void RemoveUser(User user, Group group)
+        {
+            _GroupUserRepository.DeleteUserFromGroupUsers(user, group);
+        }
     }
 }

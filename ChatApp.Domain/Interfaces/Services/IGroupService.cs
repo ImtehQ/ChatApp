@@ -11,5 +11,7 @@ namespace ChatApp.Domain.Interfaces
     public interface IGroupService
     {
         Group Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup);
+        Group GetGroupById(int groupId);
+        void RemoveGroup(int groupId);
     }
 }

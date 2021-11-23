@@ -13,5 +13,7 @@ namespace ChatApp.Domain.Interfaces.Repositorys
         IEnumerable<GroupUser> GetGroupUsers();
         void Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup);
         void Save();
+        void DeleteGroupUser(Group group);
+        void DeleteUserFromGroupUsers(User user, Group group);
     }
 }

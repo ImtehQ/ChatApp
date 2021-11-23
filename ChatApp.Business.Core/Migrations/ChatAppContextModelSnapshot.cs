@@ -84,7 +84,7 @@ namespace ChatApp.Business.Core.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("GroupId")
+                    b.Property<int>("GroupId")
                         .HasColumnType("int");
 
                     b.Property<bool>("Read")
@@ -97,8 +97,6 @@ namespace ChatApp.Business.Core.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("MessageId");
-
-                    b.HasIndex("GroupId");
 
                     b.HasIndex("UserId");
 
@@ -161,20 +159,11 @@ namespace ChatApp.Business.Core.Migrations
 
             modelBuilder.Entity("ChatApp.Domain.Models.Message", b =>
                 {
-                    b.HasOne("ChatApp.Domain.Models.Group", null)
-                        .WithMany("messageIds")
-                        .HasForeignKey("GroupId");
-
                     b.HasOne("ChatApp.Domain.Models.User", "SenderId")
                         .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("SenderId");
-                });
-
-            modelBuilder.Entity("ChatApp.Domain.Models.Group", b =>
-                {
-                    b.Navigation("messageIds");
                 });
 #pragma warning restore 612, 618
         }

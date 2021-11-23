@@ -20,6 +20,20 @@ namespace ChatApp.Business.Core.Repositorys
             this.context = context;
         }
 
+        public void DeleteGroupUser(Group group)
+        {
+            List<GroupUser> results = context.GroupUsers.Where(gu => gu.Group == group).ToList();
+
+            context.GroupUsers.RemoveRange(results);
+        }
+
+        public void DeleteUserFromGroupUsers(User user, Group group)
+        {
+            List<GroupUser> results = context.GroupUsers.Where(gu => gu.User == user && gu.Group == group).ToList();
+
+            context.GroupUsers.RemoveRange(results);
+        }
+
         public IEnumerable<GroupUser> GetGroupUsers()
         {
             return context.GroupUsers.Include(g => g.Group).ToList();

@@ -9,6 +9,7 @@ using ChatApp.Domain.Models;
 using ChatApp.Domain.Interfaces.Services;
 using System.Collections.Generic;
 using ChatApp.Business.Core.Extensions;
+using ChatApp.Business.Core.Services;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -19,12 +20,21 @@ namespace ChatApp.API.MIP.Controllers
         IGroupService _GroupService { get; set; }
         IUserService _UserService { get; set; }
         IGroupUserService _GroupUserService { get; set; }
+        IMessageService _MessageService { get; set; }
+        IInviteService _InviteService { get; set; }
 
-        public GroupsController(IGroupService GroupService, IUserService userService, IGroupUserService groupUserService)
+        public GroupsController(
+            IGroupService GroupService, 
+            IUserService userService, 
+            IGroupUserService groupUserService,
+            IMessageService messageService,
+            IInviteService inviteService)
         {
             _GroupService = GroupService;
             _UserService = userService;
             _GroupUserService = groupUserService;
+            _MessageService = messageService;
+            _InviteService = inviteService;
         }
 
         [HttpGet]
@@ -55,18 +65,84 @@ namespace ChatApp.API.MIP.Controllers
             return Ok("Reponse not implemented");
         }
 
+
         [HttpPost]
         [Route("groups/join")]
-        public void Join(int GroupId, int UserId, string Message)
+        [Authorize(AccountRoleEnum.RoleUser)]
+        public IActionResult Invite(int inviteId)
         {
-            
+            User user = _UserService.GetUserById(HttpContext.User.GetUserID());
+
+            Invite invite = _InviteService.GetInviteById(inviteId);
+            if (invite == null)
+                return BadRequest("Invite not valid");
+
+            Group group = _GroupService.GetGroupById(invite.GroupId);
+
+            if(group == null)
+                return BadRequest("Invite not valid");
+
+            _GroupUserService.Insert(user, group, AccountRoleEnum.RoleUser);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("groups/join")]
+        [Authorize(AccountRoleEnum.RoleModerator, true)]
+        public IActionResult Join(int GroupId, int UserId, string Message)
+        {
+            User User = _UserService.GetUserById(UserId);
+
+            User senderUser = _UserService.GetUserById(HttpContext.User.GetUserID());
+
+            Group group = _GroupService.Create("Invite chat", "", 2, GroupVisibilityEnum.OptionPrivate, GroupTypeEnum.OptionPrivate);
+
+            _GroupUserService.Join(group, senderUser, AccountRoleEnum.RoleAdmin);
+
+            _GroupUserService.Join(group, User, AccountRoleEnum.RoleUser);
+
+            Invite invite = new Invite() { GroupId = group.GroupId, Message = Message };
+
+            _InviteService.Register(invite);
+
+            _MessageService.SendMessage(Message, senderUser, GroupTypeEnum.OptionPrivate, group.GroupId);
+            _MessageService.SendMessage($"Invite: {invite.Id}", senderUser, GroupTypeEnum.OptionPrivate, group.GroupId);
+
+            return Ok("Not implimantata");
         }
 
         [HttpPost]
         [Route("groups/remove")]
-        public void Remove(int UserId, int GroupId)
+        [Authorize(AccountRoleEnum.RoleModerator, true)]
+        public IActionResult RemoveGroup(int GroupId)
         {
-              
+            Group group = _GroupService.GetGroupById(GroupId);
+            if (group == null)
+                return NotFound("Group");
+
+            _GroupUserService.RemoveGroup(group);
+            _GroupService.RemoveGroup(group.GroupId);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("groups/remove")]
+        [Authorize(AccountRoleEnum.RoleModerator, true)]
+        public IActionResult RemoveUser(int userId, int GroupId)
+        {
+            Group group = _GroupService.GetGroupById(GroupId);
+            if (group == null)
+                return NotFound("Group");
+
+            User user = _UserService.GetUserById(userId);
+            if(user == null)
+                return NotFound("User");
+
+            _GroupUserService.RemoveUser(user, group);
+
+            return Ok();
         }
     }
 

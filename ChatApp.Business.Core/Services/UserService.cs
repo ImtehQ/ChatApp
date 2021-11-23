@@ -104,5 +104,33 @@ namespace ChatApp.Business.Core.Services
             _userRepository.UpdateUser(user);
             return response.Successfull(HttpStatusCode.OK);
         }
+
+        public IResponse AccountUpdate(int userId, string username, string emailaddress, string password)
+        {
+            var usernameValidator = UserContentValidator.RegisterUsername(username);
+            if (usernameValidator.Valid == false) return usernameValidator;
+
+            var emailValidator = UserContentValidator.RegisterEmailAddress(emailaddress);
+            if (emailValidator.Valid == false) return emailValidator;
+
+            var passwordValidator = UserContentValidator.RegisterPassword(password);
+            if (passwordValidator.Valid == false) return passwordValidator;
+
+            IResponse response = new Response(ResponseMethodCode.Update, ResponseLayerCode.Service,
+            new object[] { userId, username, emailaddress, password });
+
+            User user = _userRepository.GetUserByID(userId);
+
+            if (user == null)
+                response.Failed(HttpStatusCode.NotFound);
+
+            user.UserName = username;
+            user.Email = emailaddress;
+            user.PasswordHash = Rfc2898.Convert(password, emailaddress);
+
+            _userRepository.UpdateUser(user);
+
+            return response.Successfull();
+        }
     }
 }

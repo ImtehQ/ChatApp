@@ -17,5 +17,6 @@ namespace ChatApp.Domain.Models
         public User SenderId { get; set; }
         public bool Received { get; set; }
         public bool Read { get; set; }
+        public int GroupId { get; set; }
     }
 }

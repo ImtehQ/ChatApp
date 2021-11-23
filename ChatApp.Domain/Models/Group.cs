@@ -16,6 +16,5 @@ namespace ChatApp.Domain.Models
         public int MaxUsers {  get; set; }
         public GroupVisibilityEnum VisibilityType {  get; set; }
         public string Password {  get; set; }
-        public Message[] messageIds { get; set; }
     }
 }

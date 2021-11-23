@@ -77,10 +77,18 @@ namespace ChatApp.API.MIP.Controllers
             return StatusCode((int)_result.Code, _result);
         }
 
-        [HttpPost]
-        public void AccountUpdate(int id, string Username, string Emailaddress, string Password)
+        [HttpPut]
+        public IActionResult AccountUpdate(int id, string Username, string Emailaddress, string Password)
         {
+            if (string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(Username) ||
+                string.IsNullOrEmpty(Emailaddress))
+            {
+                return BadRequest("IsNullOrEmpty");
+            }
 
+            IResponse _result = _UserService.AccountUpdate(id, Username, Emailaddress, Password);
+
+            return StatusCode((int)_result.Code, _result);
         }
 
 
@@ -90,9 +98,12 @@ namespace ChatApp.API.MIP.Controllers
         [HttpGet]
         [Route("block/{userId}")]
         [Authorize(AccountRoleEnum.RoleModerator)]
-        public void Block(int userId)
+        public IActionResult Block(int userId)
         {
-            //return _UserService.BlockUserById();
+            if (userId <= 0)
+                return BadRequest("Invalid userId");
+            IResponse _result = _UserService.BlockUserById(userId);
+            return StatusCode((int)_result.Code, _result);
         }
     }
 }

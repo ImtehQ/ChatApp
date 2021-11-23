@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ChatApp.Business.Core.Migrations
 {
-    public partial class usermodelUpdate1 : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,7 +17,7 @@ namespace ChatApp.Business.Core.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     MaxUsers = table.Column<int>(type: "int", nullable: false),
                     VisibilityType = table.Column<int>(type: "int", nullable: false),
-                    Password = table.Column<int>(type: "int", nullable: false)
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -51,8 +51,8 @@ namespace ChatApp.Business.Core.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GroupId = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: false),
+                    GroupId = table.Column<int>(type: "int", nullable: true),
+                    UserId = table.Column<int>(type: "int", nullable: true),
                     AccountRole = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -63,7 +63,13 @@ namespace ChatApp.Business.Core.Migrations
                         column: x => x.GroupId,
                         principalTable: "Groups",
                         principalColumn: "GroupId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GroupUsers_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,17 +83,11 @@ namespace ChatApp.Business.Core.Migrations
                     UserId = table.Column<int>(type: "int", nullable: true),
                     Received = table.Column<bool>(type: "bit", nullable: false),
                     Read = table.Column<bool>(type: "bit", nullable: false),
-                    GroupId = table.Column<int>(type: "int", nullable: true)
+                    GroupId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Messages", x => x.MessageId);
-                    table.ForeignKey(
-                        name: "FK_Messages_Groups_GroupId",
-                        column: x => x.GroupId,
-                        principalTable: "Groups",
-                        principalColumn: "GroupId",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Messages_Users_UserId",
                         column: x => x.UserId,
@@ -99,13 +99,12 @@ namespace ChatApp.Business.Core.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_GroupUsers_GroupId",
                 table: "GroupUsers",
-                column: "GroupId",
-                unique: true);
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_GroupId",
-                table: "Messages",
-                column: "GroupId");
+                name: "IX_GroupUsers_UserId",
+                table: "GroupUsers",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_UserId",

@@ -14,10 +14,12 @@ namespace ChatApp.Business.Core.Authentication
     public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
         AccountRoleEnum accountRoleRequired;
+        bool isGroupRole = false;
 
-        public AuthorizeAttribute(AccountRoleEnum accountRole)
+        public AuthorizeAttribute(AccountRoleEnum accountRole, bool groupRole = false)
         {
             accountRoleRequired = accountRole;
+            isGroupRole = groupRole;
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)

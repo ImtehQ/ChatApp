@@ -13,5 +13,8 @@ namespace ChatApp.Domain.Interfaces.Services
         IResponse GetAllUsersByGroupType(User user, GroupTypeEnum groupType);
         List<Group> GetGroupsByUser(User user);
         void Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup);
+        IResponse Join(Group group, User user, AccountRoleEnum accountRole);
+        void RemoveGroup(Group group);
+        void RemoveUser(User user, Group group);
     }
 }

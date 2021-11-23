@@ -16,6 +16,7 @@ namespace ChatApp.Business.Core.DbContexts
         public DbSet<Group> Groups { get; set; }
         public DbSet<GroupUser> GroupUsers { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Invite> Invites { get; set; }
 
         public ChatAppContext(DbContextOptions<ChatAppContext> options) : base(options) { }
 

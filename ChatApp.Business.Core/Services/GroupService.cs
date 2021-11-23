@@ -19,6 +19,11 @@ namespace ChatApp.Business.Core.Services
             _GroupRepository = groupRepository;
         }
 
+        public Group GetGroupById(int groupId)
+        {
+            return _GroupRepository.GetGroupByID(groupId);
+        }
+
         public Group Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
             Group group = new Group()
@@ -34,6 +39,11 @@ namespace ChatApp.Business.Core.Services
             _GroupRepository.Save();
 
             return group;
+        }
+
+        public void RemoveGroup(int groupId)
+        {
+            _GroupRepository.DeleteGroup(groupId);
         }
     }
 }

@@ -23,4 +23,9 @@
     <ProjectReference Include="..\ChatApp.Domain\ChatApp.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Lotus\" />
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>
