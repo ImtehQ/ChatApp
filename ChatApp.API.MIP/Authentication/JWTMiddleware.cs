@@ -1,6 +1,4 @@
-﻿using ChatApp.Domain.Interfaces;
-using ChatApp.Domain.Models;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -9,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ChatApp.Domain.Interfaces.Services;
+using ChatApp.Domain.Models;
+using System.Collections.Generic;
 
 namespace ChatApp.API.MIP
 {
@@ -47,7 +47,8 @@ namespace ChatApp.API.MIP
                     if (string.IsNullOrEmpty(accountId) == false)
                     {
                         // attach account to context on successful jwt validation
-                        context.Items["User"] = userService.GetUserById(Convert.ToInt32(accountId));
+                        User user = userService.GetUserById(Convert.ToInt32(accountId)).GetResponseObject<User>();
+                        context.Items["User"] = user;
                     }
                 }
                 catch

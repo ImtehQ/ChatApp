@@ -4,6 +4,7 @@ using ChatApp.Business.Core.Validator;
 using ChatApp.Domain.Enums;
 using ChatApp.Domain.Enums.ResponseCodes;
 using ChatApp.Domain.Interfaces;
+using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetAllMessages(int groupId, int pageNr)
         {
-            Response response = new Response(ResponseMethodCode.GetMessages, ResponseLayerCode.Service,
+            Bfet response = new Bfet(MethodCode.GetMessages, LayerCode.Service,
                new object[] { groupId, pageNr });
 
             List<Message> messages = _messageRepository.GetMessages()
@@ -38,7 +39,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetAllMessages(int groupId, int pageNr, string Query)
         {
-            Response response = new Response(ResponseMethodCode.GetMessages, ResponseLayerCode.Service,
+            Bfet response = new Bfet(MethodCode.GetMessages, LayerCode.Service,
                new object[] { groupId, pageNr });
 
             List<Message> messages = _messageRepository.GetMessages()
@@ -51,7 +52,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse SendMessage(string message, User sender, GroupTypeEnum groupType, int groupId)
         {
-            Response response = new Response(ResponseMethodCode.SendMessage, ResponseLayerCode.Service,
+            Bfet response = new Bfet(MethodCode.SendMessage, LayerCode.Service,
                 new object[] { message, sender, groupType, groupId });
 
             var messageValidator = MessageContentValidator.CheckContent(message);

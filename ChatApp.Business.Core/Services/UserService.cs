@@ -16,7 +16,6 @@ using System.Net;
 
 namespace ChatApp.Business.Core.Services
 {
-   
     public class UserService : IUserService
     {
         IUserRepository _userRepository;
@@ -30,16 +29,23 @@ namespace ChatApp.Business.Core.Services
             _JWTToken = jwt.Value;
         }
 
-        public User GetUserById(int Id)
+        public IResponse GetUserById(int Id)
         {
-            return _userRepository.GetUserByID(Id);
+            Bfet response = new Bfet(MethodCode.GetUserById, LayerCode.Service,
+                new object[] { Id });
+
+            return response.Link(_userRepository.GetUserByID(Id));
         }
 
         public IResponse Login(string username, string password)
         {
-            Response response = new Response(ResponseMethodCode.Login, ResponseLayerCode.Service,
+            Bfet response = new Bfet(MethodCode.Login, LayerCode.Service,
                 new object[] { username, password });
-            
+
+            var response2 = response.Link(MethodCode.Login, LayerCode.Service, null);
+
+            var response3 = new Response(response2, MethodCode.Login, LayerCode.Service, null);
+
             var userFound = _userRepository.GetUsers().First(u => u.UserName == username);
 
             if (userFound == null)
@@ -58,8 +64,8 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse Register(string name, string username, string emailaddress, string password)
         {
-            Response response = new Response(
-                ResponseMethodCode.Register, ResponseLayerCode.Service,
+            Bfet response = new Bfet(
+                MethodCode.Register, LayerCode.Service,
                 new object[] { name, username, emailaddress, password });
 
             var nameValidator = UserContentValidator.RegisterName(name);
@@ -92,7 +98,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse BlockUserById(int userId)
         {
-            IResponse response = new Response(ResponseMethodCode.Block, ResponseLayerCode.Service, userId);
+            IResponse response = new Bfet(MethodCode.Block, LayerCode.Service, userId);
 
             User user = _userRepository.GetUserByID(userId);
             if (user == null)
@@ -116,7 +122,7 @@ namespace ChatApp.Business.Core.Services
             var passwordValidator = UserContentValidator.RegisterPassword(password);
             if (passwordValidator.Valid == false) return passwordValidator;
 
-            IResponse response = new Response(ResponseMethodCode.Update, ResponseLayerCode.Service,
+            IResponse response = new Bfet(MethodCode.Update, LayerCode.Service,
             new object[] { userId, username, emailaddress, password });
 
             User user = _userRepository.GetUserByID(userId);

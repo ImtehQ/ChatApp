@@ -34,6 +34,11 @@ namespace ChatApp.Business.Core.Repositorys
             context.GroupUsers.RemoveRange(results);
         }
 
+        public GroupUser GetGroupUser(User user, Group group)
+        {
+            return context.GroupUsers.Where(gu => gu.User == user && gu.Group == group).FirstOrDefault();
+        }
+
         public IEnumerable<GroupUser> GetGroupUsers()
         {
             return context.GroupUsers.Include(g => g.Group).ToList();

@@ -2,7 +2,6 @@ using ChapApp.Business.Core.Repositorys;
 using ChatApp.Business.Core.Authentication;
 using ChatApp.Business.Core.DbContexts;
 using ChatApp.Business.Core.Services;
-using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Repositorys;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
@@ -19,6 +18,8 @@ using ChatApp.Business.Core.Repositorys;
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using ChatApp.Domain.Interfaces.Services;
+using ChatApp.Domain.Interfaces;
 
 namespace ChatApp.API.MIP
 {

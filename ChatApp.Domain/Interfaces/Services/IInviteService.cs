@@ -1,11 +1,11 @@
 ﻿using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Models;
 
-namespace ChatApp.Business.Core.Services
+namespace ChatApp.Domain.Interfaces.Services
 {
     public interface IInviteService
     {
         IResponse Register(Invite invite);
-        Invite GetInviteById(int inviteId);
+        IResponse GetInviteById(int inviteId);
     }
 }

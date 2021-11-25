@@ -20,20 +20,23 @@ namespace ChatApp.Business.Core.Services
             _GroupUserRepository = groupUserRepository;
         }
 
-        public List<Group> GetGroupsByUser(User user)
+        public IResponse GetGroupsByUser(User user)
         {
-            return _GroupUserRepository.GetGroupUsers()
+            IResponse response = new Bfet(MethodCode.GetGroupsByUser, LayerCode.Service, user);
+
+            return response.Successfull(_GroupUserRepository.GetGroupUsers()
                 .Where(u => u.Id == user.UserId)
-                .Select(x => x.Group).ToList();
+                .Select(x => x.Group).ToList());
         }
-        public void Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup)
+        public IResponse Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup)
         {
             _GroupUserRepository.Insert(user, group, accountRoleWithinGroup);
             _GroupUserRepository.Save();
+            return new Bfet(MethodCode.Insert, LayerCode.Service, user);
         }
         public IResponse GetAllUsersByGroupType(User user, GroupTypeEnum groupType)
         {
-            IResponse response = new Response(ResponseMethodCode.List, ResponseLayerCode.Service, groupType);
+            IResponse response = new Bfet(MethodCode.List, LayerCode.Service, groupType);
 
             List<GroupUser> Users = new List<GroupUser>();
 
@@ -60,7 +63,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse Join(Group group, User user, AccountRoleEnum accountRole)
         {
-            IResponse response = new Response(ResponseMethodCode.Join, ResponseLayerCode.Service, 
+            IResponse response = new Bfet(MethodCode.Join, LayerCode.Service, 
                 new object[] { group, user, accountRole });
 
             _GroupUserRepository.Insert(user, group, accountRole);
@@ -68,14 +71,22 @@ namespace ChatApp.Business.Core.Services
             return response.Successfull();
         }
 
-        public void RemoveGroup(Group group)
+        public IResponse RemoveGroup(Group group)
         {
             _GroupUserRepository.DeleteGroupUser(group);
         }
 
-        public void RemoveUser(User user, Group group)
+        public IResponse RemoveUser(User user, Group group)
         {
             _GroupUserRepository.DeleteUserFromGroupUsers(user, group);
+        }
+
+        public IResponse GetAccountRoleByUser(User user, Group group)
+        {
+            IResponse response = new Bfet(MethodCode.GetGroupsRoleByUser, LayerCode.Service,
+                new object[] { user, group });
+
+            return response.Successfull(_GroupUserRepository.GetGroupUser(user, group).AccountRole);
         }
     }
 }

@@ -7,21 +7,43 @@ using System.Net;
 
 namespace ChatApp.Business.Core.Responses
 {
-    public class Response : IResponse
+    public class Bfet : IResponse
     {
         public bool Valid { get; private set; }
         public HttpStatusCode Code { get; set; }
-        public ResponseMethodCode MethodCode { get; init; }
-        public ResponseLayerCode LayerCode { get; init; }
-        public object Content { get; init; }
-        public string Message { get; private set; }
-        public object ResponseObject { get; private set; }
+        public MethodCode MethodCode { get; init; }
+        public LayerCode LayerCode { get; init; }
+        public object Note { get; init; }
+        public string Report { get; private set; }
+        public object Echo { get; private set; }
+        public List<IResponse> Children { get; private set; }
 
-        public Response(ResponseMethodCode responseMethod, ResponseLayerCode responseLayer, object refContent)
+        public Bfet(Bfet Parent, MethodCode Method, LayerCode Layer, object Content)
         {
-            MethodCode = responseMethod;
-            LayerCode = responseLayer;
-            Content = refContent;
+            Parent.Link(new Bfet(Method, Layer, Content));
+        }
+        public Bfet(MethodCode Method, LayerCode Layer, object Content)
+        {
+            MethodCode = Method;
+            LayerCode = Layer;
+            Note = Content;
+        }
+
+        public bool GetValid()
+        {
+            if (Valid == false)
+                return false;
+            for (int i = 0; i < Children.Count; i++)
+            {
+                if (Children[i].Valid == false)
+                    return false;
+            }
+            return true;
+        }
+
+        public T GetResponseObject<T>()
+        {
+            return (T)Echo;
         }
 
         public IResponse Successfull()
@@ -35,7 +57,7 @@ namespace ChatApp.Business.Core.Responses
         {
             Valid = true;
             Code = HttpStatusCode.OK;
-            Message = message;
+            Report = message;
             return this;
         }
 
@@ -43,7 +65,7 @@ namespace ChatApp.Business.Core.Responses
         {
             Valid = true;
             Code = HttpStatusCode.OK;
-            ResponseObject = responseObject;
+            Echo = responseObject;
             return this;
         }
 
@@ -51,8 +73,8 @@ namespace ChatApp.Business.Core.Responses
         {
             Valid = true;
             Code = HttpStatusCode.OK;
-            Message = message;
-            ResponseObject = responseObject;
+            Report = message;
+            Echo = responseObject;
             return this;
         }
 
@@ -67,7 +89,7 @@ namespace ChatApp.Business.Core.Responses
         {
             Valid = true;
             Code = statusCode;
-            Message = message;
+            Report = message;
             return this;
         }
 
@@ -75,15 +97,15 @@ namespace ChatApp.Business.Core.Responses
         {
             Valid = true;
             Code = statusCode;
-            ResponseObject = responseObject;
+            Echo = responseObject;
             return this;
         }
         public IResponse Successfull(HttpStatusCode statusCode, string message, object responseObject)
         {
             Valid = true;
             Code = statusCode;
-            ResponseObject = responseObject;
-            Message = message;
+            Echo = responseObject;
+            Report = message;
             return this;
         }
 
@@ -97,7 +119,18 @@ namespace ChatApp.Business.Core.Responses
         {
             Valid = false;
             Code = statusCode;
-            Message = message;
+            Report = message;
+            return this;
+        }
+
+        public IResponse Link(IResponse response)
+        {
+            Children.Add(response);
+            return this;
+        }
+        public IResponse Link(IResponse[] responses)
+        {
+            Children.AddRange(responses);
             return this;
         }
     }

@@ -6,12 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChatApp.Domain.Interfaces
+namespace ChatApp.Domain.Interfaces.Services
 {
     public interface IGroupService
     {
-        Group Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup);
-        Group GetGroupById(int groupId);
-        void RemoveGroup(int groupId);
+        IResponse Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup);
+        IResponse GetGroupById(int groupId);
+        IResponse RemoveGroup(int groupId);
     }
 }

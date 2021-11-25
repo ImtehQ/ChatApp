@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ChatApp.Domain.Enums.ResponseCodes
 {
-    public enum ResponseLayerCode
+    public enum LayerCode
     {
         Api = 0,
         Service = 1,

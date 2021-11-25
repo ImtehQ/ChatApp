@@ -15,5 +15,6 @@ namespace ChatApp.Domain.Interfaces.Repositorys
         void Save();
         void DeleteGroupUser(Group group);
         void DeleteUserFromGroupUsers(User user, Group group);
+        GroupUser GetGroupUser(User user, Group group);
     }
 }

@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using Microsoft.AspNetCore.Mvc;
 using IAuthorizationFilter = Microsoft.AspNetCore.Mvc.Filters.IAuthorizationFilter;
 using JsonResult = Microsoft.AspNetCore.Mvc.JsonResult;
+using System.Collections.Generic;
 
 namespace ChatApp.Business.Core.Authentication
 {
@@ -14,17 +15,16 @@ namespace ChatApp.Business.Core.Authentication
     public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
         AccountRoleEnum accountRoleRequired;
-        bool isGroupRole = false;
 
-        public AuthorizeAttribute(AccountRoleEnum accountRole, bool groupRole = false)
+        public AuthorizeAttribute(AccountRoleEnum accountRole)
         {
             accountRoleRequired = accountRole;
-            isGroupRole = groupRole;
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var account = (User)context.HttpContext.Items["User"];
+
             if (account == null)
             {
                 context.Result = new JsonResult(string.Empty) { StatusCode = StatusCodes.Status401Unauthorized };
@@ -34,6 +34,10 @@ namespace ChatApp.Business.Core.Authentication
                 if (account.Role >= accountRoleRequired)
                 {
                     return;
+                }
+                else
+                {
+                    context.Result = new JsonResult(string.Empty) { StatusCode = StatusCodes.Status401Unauthorized };
                 }
             }
         }

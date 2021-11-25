@@ -10,8 +10,8 @@ namespace ChatApp.Business.Domain.Responses
 {
     public class ResponseCode //2-1-14
     {
-        public ResponseLayerCode LayerCode { get; init; } //x
-        public ResponseMethodCode MethodCode { get; init; } //x-x
+        public LayerCode LayerCode { get; init; } //x
+        public MethodCode MethodCode { get; init; } //x-x
 
         public List<int> ToCodes()
         {
@@ -19,8 +19,8 @@ namespace ChatApp.Business.Domain.Responses
         }
 
         public static ResponseCode NewCode(
-            ResponseLayerCode layerCode, 
-            ResponseMethodCode methodCode)
+            LayerCode layerCode, 
+            MethodCode methodCode)
         {
             return new ResponseCode()
             {

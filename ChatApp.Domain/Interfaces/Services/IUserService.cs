@@ -9,7 +9,7 @@ namespace ChatApp.Domain.Interfaces.Services
 {
     public interface IUserService
     {
-        User GetUserById(int Id);
+        IResponse GetUserById(int Id);
         IResponse Login(string username, string password);
         IResponse Register(string name, string username, string emailaddress, string password);
         IResponse BlockUserById(int userId);

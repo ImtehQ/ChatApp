@@ -21,17 +21,11 @@ namespace ChatApp.API.MIP.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        IUserService _UserService { get; set; }
-        IGroupService _GroupService { get; set; }
-        IGroupUserService _GroupUserService { get; set; }
+        IAppService _appService;
 
-        IJWTAuthService _JWTAuthService { get; set; }
-
-        public UsersController(IUserService UserService, IJWTAuthService jWTAuthService, IGroupUserService GroupUserService)
+        public UsersController(IAppService appService)
         {
-            _UserService = UserService;
-            _JWTAuthService = jWTAuthService;
-            _GroupUserService = GroupUserService;
+            _appService = appService;
         }
 
         [HttpGet]
@@ -39,10 +33,8 @@ namespace ChatApp.API.MIP.Controllers
         [Authorize(AccountRoleEnum.RoleUser)]
         public IActionResult List(GroupTypeEnum groupType)
         {
-            User user = _UserService.GetUserById(HttpContext.User.GetUserID());
-            IResponse _result = _GroupUserService.GetAllUsersByGroupType(user, groupType);
-
-            return StatusCode((int)_result.Code, _result);
+            IResponse response = _appService.List(HttpContext.User.GetUserID(), groupType);
+            return StatusCode((int)response.Code, response);
         }
 
         [HttpPost]
@@ -50,60 +42,33 @@ namespace ChatApp.API.MIP.Controllers
         [Route("token/")]
         public IActionResult Login(string Username, string Password)
         {
-            if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Username))
-                return BadRequest("IsNullOrEmpty");
-
-            IResponse _result = _UserService.Login(Username, Password);
-
-            return StatusCode((int)_result.Code, _result);
-
+            IResponse response =  _appService.Login(Username, Password);
+            return StatusCode((int)response.Code, response);
         }
-
 
         [HttpGet]
         [AllowAnonymous]
         [Route("reg/")]
         public IActionResult Register(string Name, string Username, string Emailaddress, string Password)
         {
-
-            if (string.IsNullOrEmpty(Name) || string.IsNullOrEmpty(Username) ||
-                string.IsNullOrEmpty(Emailaddress))
-            {
-                return BadRequest("IsNullOrEmpty");
-            }
-
-            IResponse _result = _UserService.Register(Name, Username, Emailaddress, Password);
-
-            return StatusCode((int)_result.Code, _result);
+            IResponse response = _appService.Register(Name, Username, Emailaddress, Password);
+            return StatusCode((int)response.Code, response);
         }
 
         [HttpPut]
         public IActionResult AccountUpdate(int id, string Username, string Emailaddress, string Password)
         {
-            if (string.IsNullOrEmpty(Password) || string.IsNullOrEmpty(Username) ||
-                string.IsNullOrEmpty(Emailaddress))
-            {
-                return BadRequest("IsNullOrEmpty");
-            }
-
-            IResponse _result = _UserService.AccountUpdate(id, Username, Emailaddress, Password);
-
-            return StatusCode((int)_result.Code, _result);
+            IResponse response = _appService.AccountUpdate(id, Username, Emailaddress, Password);
+            return StatusCode((int)response.Code, response);
         }
-
-
-
-
 
         [HttpGet]
         [Route("block/{userId}")]
         [Authorize(AccountRoleEnum.RoleModerator)]
         public IActionResult Block(int userId)
         {
-            if (userId <= 0)
-                return BadRequest("Invalid userId");
-            IResponse _result = _UserService.BlockUserById(userId);
-            return StatusCode((int)_result.Code, _result);
+            IResponse response = _appService.BlockUser(userId);
+            return StatusCode((int)response.Code, response);
         }
     }
 }

@@ -1,12 +1,9 @@
-﻿using ChapApp.Business.Domain.Interfaces;
+﻿using ChatApp.Business.Core.Responses;
 using ChatApp.Domain.Enums;
+using ChatApp.Domain.Enums.ResponseCodes;
 using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ChatApp.Domain.Interfaces.Services;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -19,13 +16,18 @@ namespace ChatApp.Business.Core.Services
             _GroupRepository = groupRepository;
         }
 
-        public Group GetGroupById(int groupId)
+        public IResponse GetGroupById(int groupId)
         {
-            return _GroupRepository.GetGroupByID(groupId);
+            IResponse response = new Bfet(MethodCode.GetGroupById, LayerCode.Service, groupId);
+
+            return response.Successfull(_GroupRepository.GetGroupByID(groupId));
         }
 
-        public Group Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
+        public IResponse Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
+            IResponse response = new Bfet(MethodCode.GetGroupById, LayerCode.Service, 
+                new object[] { Name, Password, MaxUsers, Visibility, GroupType});
+
             Group group = new Group()
             {
                 Name = Name,
@@ -38,12 +40,15 @@ namespace ChatApp.Business.Core.Services
             _GroupRepository.InsertGroup(group);
             _GroupRepository.Save();
 
-            return group;
+            return response.Successfull(group);
         }
 
-        public void RemoveGroup(int groupId)
+        public IResponse RemoveGroup(int groupId)
         {
+            IResponse response = new Bfet(MethodCode.GetGroupById, LayerCode.Service,
+                groupId);
             _GroupRepository.DeleteGroup(groupId);
+            return response.Successfull();
         }
     }
 }
