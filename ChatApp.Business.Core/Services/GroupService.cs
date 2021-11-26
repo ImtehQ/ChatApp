@@ -18,14 +18,14 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetGroupById(int groupId)
         {
-            IResponse response = new Bfet(MethodCode.GetGroupById, LayerCode.Service, groupId);
+            IResponse response = new Response(MethodCode.GetGroupById, LayerCode.Service, groupId);
 
             return response.Successfull(_GroupRepository.GetGroupByID(groupId));
         }
 
         public IResponse Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
-            IResponse response = new Bfet(MethodCode.GetGroupById, LayerCode.Service, 
+            IResponse response = new Response(MethodCode.GetGroupById, LayerCode.Service, 
                 new object[] { Name, Password, MaxUsers, Visibility, GroupType});
 
             Group group = new Group()
@@ -45,7 +45,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse RemoveGroup(int groupId)
         {
-            IResponse response = new Bfet(MethodCode.GetGroupById, LayerCode.Service,
+            IResponse response = new Response(MethodCode.GetGroupById, LayerCode.Service,
                 groupId);
             _GroupRepository.DeleteGroup(groupId);
             return response.Successfull();

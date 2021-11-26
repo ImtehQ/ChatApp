@@ -15,7 +15,7 @@ namespace ChatApp.Business.Core.Validator
     {
         public static IResponse CheckContent(string message)
         {
-            IResponse response = new Bfet(MethodCode.CheckMessageContent, LayerCode.Validator, message);
+            IResponse response = new Response(MethodCode.CheckMessageContent, LayerCode.Validator, message);
 
             message = message.ToLower();
             if (message.Contains("kut"))

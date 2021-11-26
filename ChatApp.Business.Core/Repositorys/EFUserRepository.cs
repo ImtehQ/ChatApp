@@ -29,7 +29,7 @@ namespace ChapApp.Business.Core.Repositorys
 
         public IResponse GetUserByID(int id)
         {
-            Bfet response = new Bfet(MethodCode.GetUserById, LayerCode.Repo,
+            Response response = new Response(MethodCode.GetUserById, LayerCode.Repo,
                 new object[] { id });
 
             User user = context.Users.Find(id);

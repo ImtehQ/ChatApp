@@ -18,14 +18,14 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetInviteById(int inviteId)
         {
-            IResponse response = new Bfet(MethodCode.GetInviteById, LayerCode.Service, inviteId);
+            IResponse response = new Response(MethodCode.GetInviteById, LayerCode.Service, inviteId);
 
             return response.Successfull(_InviteRepository.GetInviteById(inviteId));
         }
 
         public IResponse Register(Invite invite)
         {
-            IResponse response = new Bfet(MethodCode.GetInviteById, LayerCode.Service, invite);
+            IResponse response = new Response(MethodCode.GetInviteById, LayerCode.Service, invite);
 
             _InviteRepository.Insert(invite);
             _InviteRepository.Save();

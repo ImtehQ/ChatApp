@@ -1,19 +1,15 @@
-﻿using ChatApp.Business.Core.Authentication;
-using ChatApp.Domain.Enums;
-using ChatApp.Domain.Interfaces;
+﻿using ChatApp.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Linq;
 using AuthorizeAttribute = ChatApp.Business.Core.Authentication.AuthorizeAttribute;
 using ChatApp.Domain.Interfaces.Services;
-using System.Net.Http;
-using System.Net;
-using ChatApp.Domain.Models;
-using System.Collections.Generic;
 using ChatApp.Business.Core.Extensions;
-using ChatApp.Business.Core.Cryptography;
-using System;
-using RandomNameGeneratorLibrary;
+using ChatApp.Domain.Interfaces.EchoResponse;
+using ChatApp.Business.Core.EchoResponse.Extensions;
+using ChatApp.Business.Core.EchoResponse.Extensions.Summary;
+using FluentResponses.Interfaces;
+using FluentResponses.Extensions;
+using FluentResponses.Extensions.Summary;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -42,8 +38,9 @@ namespace ChatApp.API.MIP.Controllers
         [Route("token/")]
         public IActionResult Login(string Username, string Password)
         {
-            IResponse response =  _appService.Login(Username, Password);
-            return StatusCode((int)response.Code, response);
+            IResponse response = this.CreateResponse().Include(_appService.Login(Username, Password));
+
+            return StatusCode((int)response.Code, response.SumResultCodes());
         }
 
         [HttpGet]

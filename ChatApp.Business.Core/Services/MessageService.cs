@@ -25,7 +25,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetAllMessages(int groupId, int pageNr)
         {
-            Bfet response = new Bfet(MethodCode.GetMessages, LayerCode.Service,
+            Response response = new Response(MethodCode.GetMessages, LayerCode.Service,
                new object[] { groupId, pageNr });
 
             List<Message> messages = _messageRepository.GetMessages()
@@ -39,7 +39,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetAllMessages(int groupId, int pageNr, string Query)
         {
-            Bfet response = new Bfet(MethodCode.GetMessages, LayerCode.Service,
+            Response response = new Response(MethodCode.GetMessages, LayerCode.Service,
                new object[] { groupId, pageNr });
 
             List<Message> messages = _messageRepository.GetMessages()
@@ -52,7 +52,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse SendMessage(string message, User sender, GroupTypeEnum groupType, int groupId)
         {
-            Bfet response = new Bfet(MethodCode.SendMessage, LayerCode.Service,
+            Response response = new Response(MethodCode.SendMessage, LayerCode.Service,
                 new object[] { message, sender, groupType, groupId });
 
             var messageValidator = MessageContentValidator.CheckContent(message);

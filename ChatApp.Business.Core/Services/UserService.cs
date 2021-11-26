@@ -13,6 +13,12 @@ using System;
 using RandomNameGeneratorLibrary;
 using System.Collections.Generic;
 using System.Net;
+using ChatApp.Domain.Interfaces.EchoResponse;
+using ChatApp.Business.Core.EchoResponse;
+using ChatApp.Business.Core.EchoResponse.Extensions;
+using FluentResponses.Interfaces;
+using FluentResponses.Extensions;
+using FluentResponses;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -31,62 +37,67 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetUserById(int Id)
         {
-            Bfet response = new Bfet(MethodCode.GetUserById, LayerCode.Service,
-                new object[] { Id });
-
-            return response.Link(_userRepository.GetUserByID(Id));
+            return this.CreateResponse()
+                .SetContent(_userRepository.GetUserByID(Id))
+                .IfNotNull()
+                .Result();
         }
 
         public IResponse Login(string username, string password)
         {
-            Bfet response = new Bfet(MethodCode.Login, LayerCode.Service,
-                new object[] { username, password });
+            IResponse response = this.CreateResponse();
 
-            var response2 = response.Link(MethodCode.Login, LayerCode.Service, null);
 
-            var response3 = new Response(response2, MethodCode.Login, LayerCode.Service, null);
+            User user = response.SetContent(_userRepository.GetUsers().First(u => u.UserName == username))
+                .IfNotNull()
+                .GetContent<User>();
 
-            var userFound = _userRepository.GetUsers().First(u => u.UserName == username);
+            if (user == null)
+                return response.ResultFailed(HttpStatusCode.NotFound, username);
 
-            if (userFound == null)
-                return response.Failed(System.Net.HttpStatusCode.NotFound, username);
+            if (user.isBlocked == true)
+                return response.ResultFailed(HttpStatusCode.Unauthorized, username);
 
-            if (userFound.isBlocked == true)
-                return response.Failed(System.Net.HttpStatusCode.Unauthorized, username);
+            if (user.PasswordHash != Rfc2898.Convert(password, username))
+                return response.ResultFailed(HttpStatusCode.Unauthorized, username);
 
-            if (userFound.PasswordHash != Rfc2898.Convert(password, username))
-                return response.Failed(System.Net.HttpStatusCode.Unauthorized, username);
+            response.SetContent(_JWTAuthService.GetToken(user, _JWTToken));
 
-            var Auth = _JWTAuthService.GetToken(userFound, _JWTToken);
-
-            return response.Successfull(Auth);
+            return response.Result();
         }
 
         public IResponse Register(string name, string username, string emailaddress, string password)
         {
-            Bfet response = new Bfet(
-                MethodCode.Register, LayerCode.Service,
-                new object[] { name, username, emailaddress, password });
+            IResponse response = this.CreateResponse();
 
-            var nameValidator = UserContentValidator.RegisterName(name);
-            if (nameValidator.Valid == false) return nameValidator;
+            response.Include(UserContentValidator.RegisterName(name));
+            if (response.GetLastInclude().isNotValid)
+                return response.ResultFailed();
 
-            var usernameValidator = UserContentValidator.RegisterUsername(username);
-            if (usernameValidator.Valid == false) return usernameValidator;
+            response.Include(UserContentValidator.RegisterUsername(username));
+            if (response.GetLastInclude().isNotValid)
+                return response.ResultFailed();
 
-            var emailValidator = UserContentValidator.RegisterEmailAddress(emailaddress);
-            if (emailValidator.Valid == false) return emailValidator;
+            response.Include(UserContentValidator.RegisterEmailAddress(emailaddress));
+            if (response.GetLastInclude().isNotValid)
+                return response.ResultFailed();
 
-            var passwordValidator = UserContentValidator.RegisterPassword(password);
-            if (passwordValidator.Valid == false) return passwordValidator;
+            response.Include(UserContentValidator.RegisterPassword(password));
+            if (response.GetLastInclude().isNotValid)
+                return response.ResultFailed();
+
 
             //===================================================================
 
-            _userRepository.InsertUser(new User() 
-            { FirstName = name, UserName = username, Email = emailaddress, PasswordHash = Rfc2898.Convert(password, username) });
+            _userRepository.InsertUser(response.SetContent<User>( new User()
+                { FirstName = name, 
+                UserName = username, 
+                Email = emailaddress, 
+                PasswordHash = Rfc2898.Convert(password, username) }));
+
             _userRepository.Save();
 
-            return response.Successfull();
+            return response.ResultSuccessfull();
         }
 
         private bool Exist(string username, string password)
@@ -98,37 +109,44 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse BlockUserById(int userId)
         {
-            IResponse response = new Bfet(MethodCode.Block, LayerCode.Service, userId);
+            IResponse response = this.CreateResponse();
 
-            User user = _userRepository.GetUserByID(userId);
-            if (user == null)
+            User user = response
+                .SetContent(_userRepository
+                .GetUserByID(userId))
+                .IfNotNull()
+                .GetContent<User>();
+
+            if(user != null)
             {
-                return response.Failed(HttpStatusCode.NotFound);
+                user.isBlocked = true;
+                _userRepository.UpdateUser(user);
             }
 
-            user.isBlocked = true;
-            _userRepository.UpdateUser(user);
-            return response.Successfull(HttpStatusCode.OK);
+            return response.Result();
         }
 
         public IResponse AccountUpdate(int userId, string username, string emailaddress, string password)
         {
-            var usernameValidator = UserContentValidator.RegisterUsername(username);
-            if (usernameValidator.Valid == false) return usernameValidator;
+            IResponse response = this.CreateResponse();
 
-            var emailValidator = UserContentValidator.RegisterEmailAddress(emailaddress);
-            if (emailValidator.Valid == false) return emailValidator;
+            response.Include(UserContentValidator.RegisterUsername(username));
+            if (response.GetLastInclude().isNotValid) 
+                return response;
 
-            var passwordValidator = UserContentValidator.RegisterPassword(password);
-            if (passwordValidator.Valid == false) return passwordValidator;
+            response.Include(UserContentValidator.RegisterEmailAddress(emailaddress));
+            if (response.GetLastInclude().isNotValid) 
+                return response;
 
-            IResponse response = new Bfet(MethodCode.Update, LayerCode.Service,
-            new object[] { userId, username, emailaddress, password });
+            response.Include(UserContentValidator.RegisterPassword(password));
+            if (response.GetLastInclude().isNotValid) 
+                return response;
 
-            User user = _userRepository.GetUserByID(userId);
+            response.Include(GetUserById(userId));
+            if (response.GetLastInclude().isNotValid)
+                return response;
 
-            if (user == null)
-                response.Failed(HttpStatusCode.NotFound);
+            User user = response.GetLastInclude().GetContent<User>();
 
             user.UserName = username;
             user.Email = emailaddress;
@@ -136,7 +154,7 @@ namespace ChatApp.Business.Core.Services
 
             _userRepository.UpdateUser(user);
 
-            return response.Successfull();
+            return response.ResultSuccessfull();
         }
     }
 }

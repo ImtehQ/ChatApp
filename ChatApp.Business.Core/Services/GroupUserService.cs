@@ -22,7 +22,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetGroupsByUser(User user)
         {
-            IResponse response = new Bfet(MethodCode.GetGroupsByUser, LayerCode.Service, user);
+            IResponse response = new Response(MethodCode.GetGroupsByUser, LayerCode.Service, user);
 
             return response.Successfull(_GroupUserRepository.GetGroupUsers()
                 .Where(u => u.Id == user.UserId)
@@ -32,11 +32,11 @@ namespace ChatApp.Business.Core.Services
         {
             _GroupUserRepository.Insert(user, group, accountRoleWithinGroup);
             _GroupUserRepository.Save();
-            return new Bfet(MethodCode.Insert, LayerCode.Service, user);
+            return new Response(MethodCode.Insert, LayerCode.Service, user);
         }
         public IResponse GetAllUsersByGroupType(User user, GroupTypeEnum groupType)
         {
-            IResponse response = new Bfet(MethodCode.List, LayerCode.Service, groupType);
+            IResponse response = new Response(MethodCode.List, LayerCode.Service, groupType);
 
             List<GroupUser> Users = new List<GroupUser>();
 
@@ -63,7 +63,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse Join(Group group, User user, AccountRoleEnum accountRole)
         {
-            IResponse response = new Bfet(MethodCode.Join, LayerCode.Service, 
+            IResponse response = new Response(MethodCode.Join, LayerCode.Service, 
                 new object[] { group, user, accountRole });
 
             _GroupUserRepository.Insert(user, group, accountRole);
@@ -83,7 +83,7 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetAccountRoleByUser(User user, Group group)
         {
-            IResponse response = new Bfet(MethodCode.GetGroupsRoleByUser, LayerCode.Service,
+            IResponse response = new Response(MethodCode.GetGroupsRoleByUser, LayerCode.Service,
                 new object[] { user, group });
 
             return response.Successfull(_GroupUserRepository.GetGroupUser(user, group).AccountRole);

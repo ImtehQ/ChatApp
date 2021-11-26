@@ -1,7 +1,7 @@
-﻿using ChatApp.Business.Core.Responses;
+﻿using ChatApp.Business.Core.EchoResponse;
 using ChatApp.Domain.Enums;
 using ChatApp.Domain.Enums.ResponseCodes;
-using ChatApp.Domain.Interfaces;
+using ChatApp.Domain.Interfaces.EchoResponse;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 
@@ -12,7 +12,7 @@ namespace ChatApp.Business.Core.AppServices
     {
         public IResponse List(int GroupId, int UserId)
         {
-            IResponse response = new Bfet(MethodCode.List, LayerCode.Service, GroupId);
+            IResponse response = new Response(MethodCode.List, LayerCode.Service, GroupId);
 
             IResponse UserResponse = _UserService.GetUserById(UserId);
 
@@ -23,7 +23,7 @@ namespace ChatApp.Business.Core.AppServices
             GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic,
             GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
-            IResponse response = new Bfet(MethodCode.Register, LayerCode.Service, Name);
+            IResponse response = new Response(MethodCode.Register, LayerCode.Service, Name);
 
             IResponse UserResponse = _UserService.GetUserById(UserId);
             response.Link(UserResponse);
@@ -42,7 +42,11 @@ namespace ChatApp.Business.Core.AppServices
 
         public IResponse Invite(int UserId, int InviteId)
         {
-            IResponse response = new Bfet(MethodCode.Invite, LayerCode.Service, new object[] { UserId, InviteId });
+            IResponse response = this.CreateResponse();
+
+
+
+            
 
             IResponse res = new Bfet(response, MethodCode.Invite, LayerCode.Service, null);
 
@@ -99,7 +103,7 @@ namespace ChatApp.Business.Core.AppServices
 
         public IResponse RemoveGroup(int GroupId)
         {
-            IResponse response = new Bfet(MethodCode.Invite, LayerCode.Service, GroupId);
+            IResponse response = new Response(MethodCode.Invite, LayerCode.Service, GroupId);
 
             IResponse GroupResponse = _GroupService.GetGroupById(GroupId);
             response.Link(GroupResponse);

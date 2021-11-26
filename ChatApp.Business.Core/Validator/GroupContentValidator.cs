@@ -15,7 +15,7 @@ namespace ChatApp.Business.Core.Validator
     {
         public static IResponse RegisterGroupName(string value)
         {
-            IResponse response = new Bfet(MethodCode.Register, LayerCode.Validator, value);
+            IResponse response = new Response(MethodCode.Register, LayerCode.Validator, value);
             if (value.Length <= 1)
                 return response.Failed(System.Net.HttpStatusCode.BadGateway, "Length <= 1");
             return response.Successfull(System.Net.HttpStatusCode.Accepted);
@@ -23,7 +23,7 @@ namespace ChatApp.Business.Core.Validator
 
         public static IResponse RegisterGroupPassword(string value)
         {
-            IResponse response = new Bfet(MethodCode.Register, LayerCode.Validator, value);
+            IResponse response = new Response(MethodCode.Register, LayerCode.Validator, value);
             if (value.Length <= 1)
                 return response.Failed(System.Net.HttpStatusCode.BadGateway, "Length <= 1");
             return response.Successfull(System.Net.HttpStatusCode.Accepted);

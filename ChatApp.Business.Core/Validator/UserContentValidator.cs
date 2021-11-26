@@ -16,7 +16,7 @@ namespace ChatApp.Business.Core.Validator
     {
         public static IResponse RegisterName(string name)
         {
-            IResponse response = new Bfet(MethodCode.Register, LayerCode.Validator, name);
+            IResponse response = new Response(MethodCode.Register, LayerCode.Validator, name);
 
             if (name.Length <= 1)
                 return response.Failed(System.Net.HttpStatusCode.BadRequest, "Length <= 1");
@@ -25,7 +25,7 @@ namespace ChatApp.Business.Core.Validator
 
         public static IResponse RegisterUsername(string username)
         {
-            IResponse response = new Bfet(MethodCode.Register, LayerCode.Validator, username);
+            IResponse response = new Response(MethodCode.Register, LayerCode.Validator, username);
 
             if (username.Length < 8)
                 return response.Failed(System.Net.HttpStatusCode.BadRequest, "Length <= 1");
@@ -34,7 +34,7 @@ namespace ChatApp.Business.Core.Validator
 
         public static IResponse RegisterPassword(string password)
         {
-            IResponse response = new Bfet(MethodCode.Register, LayerCode.Validator, password);
+            IResponse response = new Response(MethodCode.Register, LayerCode.Validator, password);
 
             if (password.Length < 8)
                 return response.Failed(System.Net.HttpStatusCode.BadRequest, "Length <= 1");
@@ -43,7 +43,7 @@ namespace ChatApp.Business.Core.Validator
 
         public static IResponse RegisterEmailAddress(string email)
         {
-            IResponse response = new Bfet(MethodCode.Register, LayerCode.Validator, email);
+            IResponse response = new Response(MethodCode.Register, LayerCode.Validator, email);
             try
             {
                 // Normalize the domain
