@@ -1,10 +1,11 @@
 ﻿using FluentResponses.Interfaces;
+using FluentResponses.Models;
 using System.Net;
 using System.Runtime.CompilerServices;
 
-namespace FluentResponses.Extensions
+namespace FluentResponses.Extensions.Initialize
 {
-    public static class ResponseExtensions
+    public static class InitializeExtensions
     {
         public static Response CreateResponse(this object Caller, IResponse Parent, [CallerMemberName] string MethodName = "")
         {
@@ -14,10 +15,38 @@ namespace FluentResponses.Extensions
         {
             return new Response(Caller, MethodName);
         }
+    }
+}
+
+
+namespace FluentResponses.Extensions
+{
+    public static class ResponseExtensions
+    {
+
+        public static Contents Add(this Contents contents, object content)
+        {
+            return new Contents(content);
+        }
+
+        public static bool Status(this IResponse response)
+        {
+            return response.Status.Value;
+        }
+
+        public static void Content(this IResponse response, object content)
+        {
+            response.Contents = new Contents( content );
+        }
+
+        public static object Content(this IResponse response)
+        {
+            return response.Contents.Content;
+        }
 
         public static IResponse Result(this IResponse response)
         {
-            if (response.IsValid)
+            if (response.status)
                 return response.ResultSuccessfull();
             else
                 return response.ResultFailed();
@@ -34,27 +63,11 @@ namespace FluentResponses.Extensions
         public static IResponse ResultFailed(this IResponse response,
             HttpStatusCode FailedCode = HttpStatusCode.BadRequest, string reportMessage = "")
         {
-            response.IsValid = false;
+            response.Status.Value = false;
             response.Code = FailedCode;
             response.SetReport(reportMessage);
             return response;
         }
 
-        public static IResponse IfNull(this IResponse response)
-        {
-            if (response.GetContent() == null)
-                response.IsValid = true;
-            else
-                response.IsValid = false;
-            return response;
-        }
-        public static IResponse IfNotNull(this IResponse response)
-        {
-            if (response.GetContent() != null)
-                response.IsValid = true;
-            else
-                response.IsValid = false;
-            return response;
-        }
     }
 }

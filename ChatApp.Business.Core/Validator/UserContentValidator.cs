@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ChatApp.Domain.Enums.ResponseCodes;
 using ChatApp.Domain.Interfaces;
+using FluentResponses.Interfaces;
+using FluentResponses;
 
 namespace ChatApp.Business.Core.Validator
 {

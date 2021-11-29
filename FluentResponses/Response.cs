@@ -1,4 +1,6 @@
-﻿using FluentResponses.Interfaces;
+﻿using FluentResponses.Conditions;
+using FluentResponses.Interfaces;
+using FluentResponses.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,17 +11,60 @@ namespace FluentResponses
 {
     public class Response : IResponse
     {
-        public bool IsValid { get; set; }
-        public bool isNotValid { get { return !IsValid; } }
-
         public Type Source { get; init; }
         public ParameterInfo[] Parameters { get; init; }
         public MethodInfo Invoker { get; init; }
 
-        public HttpStatusCode Code { get; set; }
-        public string Report { get; private set; }
-        private object _Content { get; set; }
-        public List<IResponse> Includes { get; private set; }
+        private HttpStatusCode _Code { get; set; }
+        public Response Code(HttpStatusCode statusCode)
+        {
+            _Code = statusCode;
+            return this;
+        }
+        public HttpStatusCode Code()
+        {
+            return _Code;
+        }
+
+        private Report _Report { get; set; }
+        public Response Report(string content)
+        {
+            _Report = new Report(content);
+            return this;
+        }
+        public string Report()
+        {
+            return _Report.Content;
+        }
+
+        private Contents _Contents { get; set; }
+        public Response Contents(object content)
+        {
+            _Contents = new Contents(content);
+            return this;
+        }
+        public object Contents()
+        {
+            return _Contents.Content;
+        }
+
+        private Responses _Includes { get; set; }
+        public Response Includes(IResponse response)
+        {
+            _Includes = new Responses(response);
+            return this;
+        }
+
+        private Status _Status { get; set; }
+        public Response Status(bool value)
+        {
+            _Status = new Status(value);
+            return this;
+        }
+        public bool Status()
+        {
+            return _Status.Value;
+        }
 
         internal Response(object Caller, string MethodName)
         {
@@ -33,52 +78,7 @@ namespace FluentResponses
             Type Source = Caller.GetType();
             Invoker = Source.GetMethod(MethodName);
             Parameters = Invoker.GetParameters();
-            Parent.Includes.Add(this);
-        }
-
-        public IResponse SetContent(object Content)
-        {
-            _Content = Content;
-            return this;
-        }
-        public T SetContent<T>(object Content)
-        {
-            _Content = Content;
-            return (T)Content;
-        }
-        public object GetContent()
-        {
-            return _Content;
-        }
-        public E GetContent<E>()
-        {
-            return (E)_Content;
-        }
-
-        public IResponse GetLastInclude()
-        {
-            return Includes.Last();
-        }
-
-        public IResponse GetInclude(int index)
-        {
-            return Includes[index];
-        }
-
-        public IResponse Include(IResponse response)
-        {
-            Includes.Add(response);
-            return this;
-        }
-        public IResponse Include(IResponse[] responses)
-        {
-            Includes.AddRange(responses);
-            return this;
-        }
-
-        public void SetReport(string reportMessage)
-        {
-            Report = reportMessage;
+            Parent.Includes(this);
         }
     }
 }

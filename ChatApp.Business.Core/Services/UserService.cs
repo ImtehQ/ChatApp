@@ -1,24 +1,16 @@
-﻿using ChatApp.Domain.Interfaces;
-using System.Linq;
-using ChatApp.Business.Core.Validator;
-using ChatApp.Business.Core.Responses;
-using ChatApp.Domain.Models;
+﻿using ChatApp.Business.Core.Authentication;
 using ChatApp.Business.Core.Cryptography;
-using Microsoft.Extensions.Options;
-using ChatApp.Business.Core.Authentication;
+using ChatApp.Business.Core.Validator;
+using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
-using ChatApp.Domain.Enums;
-using ChatApp.Domain.Enums.ResponseCodes;
-using System;
-using RandomNameGeneratorLibrary;
-using System.Collections.Generic;
-using System.Net;
-using ChatApp.Domain.Interfaces.EchoResponse;
-using ChatApp.Business.Core.EchoResponse;
-using ChatApp.Business.Core.EchoResponse.Extensions;
-using FluentResponses.Interfaces;
+using ChatApp.Domain.Models;
 using FluentResponses.Extensions;
-using FluentResponses;
+using FluentResponses.Extensions.Summary;
+using FluentResponses.Interfaces;
+using FluentResponses.Extensions.Initialize;
+using Microsoft.Extensions.Options;
+using System.Linq;
+using System.Net;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -37,10 +29,10 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetUserById(int Id)
         {
-            return this.CreateResponse()
-                .SetContent(_userRepository.GetUserByID(Id))
-                .IfNotNull()
-                .Result();
+            IResponse response = this.CreateResponse().Contents(_userRepository.GetUserByID(Id));
+            if(response.Status() == false)
+                this.CreateResponse().Report("User is not found").Code(HttpStatusCode.NotFound);
+
         }
 
         public IResponse Login(string username, string password)
@@ -89,11 +81,13 @@ namespace ChatApp.Business.Core.Services
 
             //===================================================================
 
-            _userRepository.InsertUser(response.SetContent<User>( new User()
-                { FirstName = name, 
-                UserName = username, 
-                Email = emailaddress, 
-                PasswordHash = Rfc2898.Convert(password, username) }));
+            _userRepository.InsertUser(response.SetContent<User>(new User()
+            {
+                FirstName = name,
+                UserName = username,
+                Email = emailaddress,
+                PasswordHash = Rfc2898.Convert(password, username)
+            }));
 
             _userRepository.Save();
 
@@ -117,7 +111,7 @@ namespace ChatApp.Business.Core.Services
                 .IfNotNull()
                 .GetContent<User>();
 
-            if(user != null)
+            if (user != null)
             {
                 user.isBlocked = true;
                 _userRepository.UpdateUser(user);
@@ -131,15 +125,15 @@ namespace ChatApp.Business.Core.Services
             IResponse response = this.CreateResponse();
 
             response.Include(UserContentValidator.RegisterUsername(username));
-            if (response.GetLastInclude().isNotValid) 
+            if (response.GetLastInclude().isNotValid)
                 return response;
 
             response.Include(UserContentValidator.RegisterEmailAddress(emailaddress));
-            if (response.GetLastInclude().isNotValid) 
+            if (response.GetLastInclude().isNotValid)
                 return response;
 
             response.Include(UserContentValidator.RegisterPassword(password));
-            if (response.GetLastInclude().isNotValid) 
+            if (response.GetLastInclude().isNotValid)
                 return response;
 
             response.Include(GetUserById(userId));

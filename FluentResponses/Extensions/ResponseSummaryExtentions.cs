@@ -1,4 +1,5 @@
 ﻿using FluentResponses.Interfaces;
+using FluentResponses.Models;
 using System.Linq;
 using System.Net;
 
@@ -6,6 +7,11 @@ namespace FluentResponses.Extensions.Summary
 {
     public static class ResponseSummaryExtentions
     {
+        public static string ReportToString(this Report report)
+        {
+            return report.ToString();
+        }
+
         public static bool SumResultIsValid(this IResponse response)
         {
             if (response.isNotValid && response.Includes.Any(x => x.IsValid == false))
