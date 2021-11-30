@@ -17,7 +17,10 @@ namespace FluentResponses.Interfaces
         Response Code(HttpStatusCode statusCode);
         object Contents();
         Response Contents(object content);
+        T Contents<T>(object content);
+        T Contents<T>();
         Response Includes(IResponse response);
+        IResponse LastIncluded();
         string Report();
         Response Report(string content);
         bool Status();

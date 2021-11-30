@@ -43,9 +43,18 @@ namespace FluentResponses
             _Contents = new Contents(content);
             return this;
         }
+        public T Contents<T>(object content)
+        {
+            _Contents = new Contents(content);
+            return (T)_Contents.Content;
+        }
         public object Contents()
         {
             return _Contents.Content;
+        }
+        public T Contents<T>()
+        {
+            return (T)_Contents.Content;
         }
 
         private Responses _Includes { get; set; }
@@ -53,6 +62,14 @@ namespace FluentResponses
         {
             _Includes = new Responses(response);
             return this;
+        }
+        public List<IResponse> Includes()
+        {
+            return _Includes.responses;
+        }
+        public IResponse LastIncluded()
+        {
+            return _Includes.Last();
         }
 
         private Status _Status { get; set; }
