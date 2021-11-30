@@ -1,6 +1,4 @@
-﻿using FluentResponses.Conditions;
-using FluentResponses.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
@@ -20,6 +18,7 @@ namespace FluentResponses.Interfaces
         T Contents<T>(object content);
         T Contents<T>();
         Response Includes(IResponse response);
+        List<IResponse> Includes();
         IResponse LastIncluded();
         string Report();
         Response Report(string content);

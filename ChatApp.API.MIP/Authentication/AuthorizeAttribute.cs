@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using IAuthorizationFilter = Microsoft.AspNetCore.Mvc.Filters.IAuthorizationFilter;
 using JsonResult = Microsoft.AspNetCore.Mvc.JsonResult;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace ChatApp.Business.Core.Authentication
 {
@@ -21,8 +23,17 @@ namespace ChatApp.Business.Core.Authentication
             accountRoleRequired = accountRole;
         }
 
+        private static bool HasAllowAnonymous(AuthorizationFilterContext context)
+        {
+            var filters = context.Filters;
+            return filters.OfType<IAllowAnonymousFilter>().Any();
+        }
+
         public void OnAuthorization(AuthorizationFilterContext context)
         {
+            if (HasAllowAnonymous(context))
+                return;
+
             var account = (User)context.HttpContext.Items["User"];
 
             if (account == null)

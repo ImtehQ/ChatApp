@@ -9,6 +9,7 @@ namespace ChatApp.Domain.Enums
         [StringValue("Moderator")]
         RoleModerator = 1,
         [StringValue("Admin")]
-        RoleAdmin = 2
+        RoleAdmin = 2,
+
     }
 }

@@ -1,15 +1,9 @@
-﻿using ChapApp.Business.Domain.Interfaces;
-using ChatApp.Business.Core.DbContexts;
-using ChatApp.Business.Core.Responses;
-using ChatApp.Domain.Enums.ResponseCodes;
+﻿using ChatApp.Business.Core.DbContexts;
 using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChapApp.Business.Core.Repositorys
 {
@@ -27,19 +21,10 @@ namespace ChapApp.Business.Core.Repositorys
             return context.Users.ToList();
         }
 
-        public IResponse GetUserByID(int id)
+        public User GetUserByID(int id)
         {
-            Response response = new Response(MethodCode.GetUserById, LayerCode.Repo,
-                new object[] { id });
-
             User user = context.Users.Find(id);
-
-            if (user == null)
-            {
-                return response.Failed(System.Net.HttpStatusCode.NotFound);
-            }
-
-            return response.Successfull();
+            return user;
         }
 
         public void InsertUser(User User)

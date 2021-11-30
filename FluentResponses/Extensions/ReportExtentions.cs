@@ -1,5 +1,6 @@
 ﻿using FluentResponses.Interfaces;
 using FluentResponses.Models;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 
@@ -7,20 +8,60 @@ namespace FluentResponses.Extensions.Reports
 {
     public static class ReportExtentions
     {
-        public static string ReportFullDetails(this Response response)
+        public static string ReportFullDetails(this IResponse response, bool CheckIfValid = true)
+        {
+            if (CheckIfValid)
+            {
+                if(response.Status() == true)
+                {
+                    return response.GenerateFullDetailedReport();
+                }
+            }
+            else
+            {
+                return response.GenerateFullDetailedReport();
+            }
+            return null;
+        }
+
+        private static string GenerateFullDetailedReport(this IResponse response)
         {
             string responseParameters = "";
             foreach (var item in response.Parameters)
             {
                 responseParameters += $"[{item.ParameterType}]({item.Name})";
             }
-            response.Report($"" +
-                $"Source:{response.Source.FullName}," +
-                $"Invoker:{response.Invoker.Name}," +
-                $"{responseParameters}");
+            string responseString = "";
+            if (response.Source != null)
+                responseString += $"Source:{response.Source.FullName},";
+            if (response.Invoker != null)
+                responseString += $"Invoker:{response.Invoker.Name}," +
+                $"{responseParameters}";
 
+            response.Report(responseString);
             return response.Report();
         }
+
+        public static string FullTrace(this IResponse response)
+        {
+            return "Nothing here yet!";
+        }
+
+        public static List<HttpStatusCode> TraceCodes(this IResponse response)
+        {
+            List<HttpStatusCode> codes = new List<HttpStatusCode>();
+            var responses = response.Includes();
+            if(responses.Count > 0)
+            {
+                codes.Add(response.Code());
+                foreach (var item in responses)
+                {
+                    codes.AddRange(item.TraceCodes());
+                }
+            }
+            return codes;
+        }
+
 
         public static bool ReportStatus(this Response response, bool FalloutIfFalse, bool defaultReturnValue = true)
         {
@@ -46,7 +87,9 @@ namespace FluentResponses.Extensions.Reports
 
         public static IResponse Failed(this IResponse response)
         {
-            return response.Status(false).Code(response.LastIncluded().Code());
+            if(response.LastIncluded() != null)
+                return response.Status(false).Code(response.LastIncluded().Code());
+            return response.Status(false);
         }
         public static IResponse Failed(this IResponse response, object failedContent, HttpStatusCode httpStatus = HttpStatusCode.BadRequest)
         {

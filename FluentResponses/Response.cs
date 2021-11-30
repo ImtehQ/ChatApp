@@ -1,9 +1,7 @@
-﻿using FluentResponses.Conditions;
-using FluentResponses.Interfaces;
+﻿using FluentResponses.Interfaces;
 using FluentResponses.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Reflection;
 
@@ -23,6 +21,8 @@ namespace FluentResponses
         }
         public HttpStatusCode Code()
         {
+            if ((int)_Code == 0)
+                return (HttpStatusCode)500;
             return _Code;
         }
 
@@ -34,6 +34,10 @@ namespace FluentResponses
         }
         public string Report()
         {
+            if (_Report == null)
+            {
+                _Report = new Report(null);
+            }
             return _Report.Content;
         }
 
@@ -50,10 +54,18 @@ namespace FluentResponses
         }
         public object Contents()
         {
+            if (_Contents == null)
+            {
+                _Contents = new Contents(null);
+            }
             return _Contents.Content;
         }
         public T Contents<T>()
         {
+            if (_Contents == null)
+            {
+                _Contents = new Contents(null);
+            }
             return (T)_Contents.Content;
         }
 
@@ -65,10 +77,18 @@ namespace FluentResponses
         }
         public List<IResponse> Includes()
         {
+            if (_Includes == null)
+            {
+                _Includes = new Responses();
+            }
             return _Includes.responses;
         }
         public IResponse LastIncluded()
         {
+            if (_Includes == null)
+            {
+                _Includes = new Responses();
+            }
             return _Includes.Last();
         }
 
@@ -80,21 +100,29 @@ namespace FluentResponses
         }
         public bool Status()
         {
+            if (_Status == null)
+            {
+                _Status = new Status(false);
+            }
             return _Status.Value;
         }
+
+
 
         internal Response(object Caller, string MethodName)
         {
             Type Source = Caller.GetType();
             Invoker = Source.GetMethod(MethodName);
-            Parameters = Invoker.GetParameters();
+            if(Invoker != null)
+                Parameters = Invoker.GetParameters();
         }
 
         internal Response(IResponse Parent, object Caller, string MethodName)
         {
             Type Source = Caller.GetType();
             Invoker = Source.GetMethod(MethodName);
-            Parameters = Invoker.GetParameters();
+            if (Invoker != null)
+                Parameters = Invoker.GetParameters();
             Parent.Includes(this);
         }
     }

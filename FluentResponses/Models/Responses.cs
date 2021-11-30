@@ -10,6 +10,10 @@ namespace FluentResponses.Models
     public class Responses
     {
         internal List<IResponse> responses { get; set; }
+        internal Responses()
+        {
+            responses = new List<IResponse>();
+        }
         internal Responses(IResponse response)
         {
             responses = new List<IResponse>();
@@ -67,6 +71,8 @@ namespace FluentResponses.Models
 
         internal IResponse Last()
         {
+            if (responses.Count == 0)
+                return null;
             return responses.Last();
         }
 

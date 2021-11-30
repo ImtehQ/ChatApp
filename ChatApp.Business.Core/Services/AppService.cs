@@ -1,9 +1,4 @@
-﻿using ChatApp.Business.Core.Responses;
-using ChatApp.Domain.Enums;
-using ChatApp.Domain.Enums.ResponseCodes;
-using ChatApp.Domain.Interfaces;
-using ChatApp.Domain.Interfaces.Services;
-using ChatApp.Domain.Models;
+﻿using ChatApp.Domain.Interfaces.Services;
 
 namespace ChatApp.Business.Core.AppServices
 {
@@ -32,9 +27,9 @@ namespace ChatApp.Business.Core.AppServices
         }
     }
 
-    
 
-    
+
+
 
     //GroupUser
     public partial class AppService : IAppService

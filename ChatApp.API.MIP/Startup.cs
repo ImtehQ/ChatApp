@@ -20,6 +20,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Interfaces;
+using ChatApp.Business.Core.AppServices;
 
 namespace ChatApp.API.MIP
 {
@@ -65,8 +66,10 @@ namespace ChatApp.API.MIP
             services.AddDbContext<ChatAppContext>(options => 
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddTransient<IUserService, UserService>();
 
+            services.AddTransient<IUserService, UserService>();
+            services.AddScoped<IAppService, AppService>();
+            services.AddScoped<IInviteService, InviteService>();
             services.AddScoped<IGroupUserService, GroupUserService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IMessageService, MessageService>();
@@ -75,6 +78,7 @@ namespace ChatApp.API.MIP
             services.AddScoped<IUserRepository, EFUserRepository>();
             services.AddScoped<IGroupRepository, EFGroupRepository>();
             services.AddScoped<IMessageRepository, EFMessageRepository>();
+            services.AddScoped<IInviteRepository, EFInviteRepository>();
 
             services.AddScoped<IJWTAuthService, JWTAuthService>();
 

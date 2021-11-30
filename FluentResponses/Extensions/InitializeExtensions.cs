@@ -1,5 +1,6 @@
 ﻿using FluentResponses.Interfaces;
 using FluentResponses.Models;
+using System;
 using System.Net;
 using System.Runtime.CompilerServices;
 
@@ -12,6 +13,11 @@ namespace FluentResponses.Extensions.Initializers
             return new Response(Parent, Caller, MethodName);
         }
         public static Response CreateResponse(this object Caller, [CallerMemberName] string MethodName = "")
+        {
+            return new Response(Caller, MethodName);
+        }
+
+        public static Response CreateResponse(Type Caller, [CallerMemberName] string MethodName = "")
         {
             return new Response(Caller, MethodName);
         }

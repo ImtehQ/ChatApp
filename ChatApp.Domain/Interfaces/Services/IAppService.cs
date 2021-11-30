@@ -1,11 +1,5 @@
 ﻿using ChatApp.Domain.Enums;
-using ChatApp.Domain.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ChatApp.Domain.Interfaces.EchoResponse;
+using FluentResponses.Interfaces;
 
 namespace ChatApp.Domain.Interfaces.Services
 {

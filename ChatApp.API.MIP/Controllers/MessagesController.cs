@@ -1,13 +1,6 @@
-﻿using ChatApp.Domain.Enums;
-using ChatApp.Domain.Interfaces;
-using ChatApp.Domain.Interfaces.Services;
-using ChatApp.Domain.Models;
+﻿using ChatApp.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -25,40 +18,40 @@ namespace ChatApp.API.MIP.Controllers
             _UserService = userService;
         }
 
-        [HttpPost]
-        [Route("messages")]
-        public IActionResult SendMessage(string Message, int Sender, int Type, int TypeId)
-        {
-            if (string.IsNullOrEmpty(Message) || Sender < 0 || Type < 0 || TypeId < 0)
-            {
-                return BadRequest("IsNullOrEmpty");
-            }
+        //[HttpPost]
+        //[Route("messages")]
+        //public IActionResult SendMessage(string Message, int Sender, int Type, int TypeId)
+        //{
+        //    if (string.IsNullOrEmpty(Message) || Sender < 0 || Type < 0 || TypeId < 0)
+        //    {
+        //        return BadRequest("IsNullOrEmpty");
+        //    }
 
-            User user = _UserService.GetUserById(Sender);
-            if(user == null)
-            {
-                return BadRequest("IsNullOrEmpty");
-            }
+        //    User user = _UserService.GetUserById(Sender);
+        //    if(user == null)
+        //    {
+        //        return BadRequest("IsNullOrEmpty");
+        //    }
 
-            IResponse _result = _MessageService.SendMessage(Message, user, (GroupTypeEnum)Type, TypeId);
+        //    IResponse _result = _MessageService.SendMessage(Message, user, (GroupTypeEnum)Type, TypeId);
 
-            return StatusCode((int)_result.Code, _result);
-        }
+        //    return StatusCode((int)_result.Code, _result);
+        //}
 
-        [HttpGet]
-        [Route("messages")]
-        public IActionResult PullMessages(int pageNr, GroupTypeEnum groupType, int groupId)
-        {
-            if (groupId < 0)
-            {
-                return BadRequest("IsNullOrEmpty");
-            }
+        //[HttpGet]
+        //[Route("messages")]
+        //public IActionResult PullMessages(int pageNr, GroupTypeEnum groupType, int groupId)
+        //{
+        //    if (groupId < 0)
+        //    {
+        //        return BadRequest("IsNullOrEmpty");
+        //    }
 
-            IResponse _result = _MessageService.GetAllMessages(groupId, pageNr);
+        //    IResponse _result = _MessageService.GetAllMessages(groupId, pageNr);
 
-            return StatusCode((int)_result.Code, _result);
-            
+        //    return StatusCode((int)_result.Code, _result);
 
-        }
+
+        //}
     }
 }

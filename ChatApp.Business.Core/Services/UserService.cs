@@ -29,8 +29,11 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetUserById(int Id)
         {
-            IResponse response = this.CreateResponse().Contents(_userRepository.GetUserByID(Id));
-            if (response.CheckValidIfContentNotNull().Status() == false)
+            IResponse response = this.CreateResponse()
+                .Contents(_userRepository.GetUserByID(Id))
+                .CheckValidIfContentNotNull();
+
+            if (response.Status() == false)
                 response.Failed(Id, HttpStatusCode.NotFound);
             else
                 response.Successfull();
@@ -102,15 +105,13 @@ namespace ChatApp.Business.Core.Services
 
             User user = response.Contents<User>(_userRepository.GetUserByID(userId));
 
-            response.CheckValidIfContentNotNull();
-
-            if (user != null)
+            if (response.CheckValidIfContentNotNull().Status() == true)
             {
                 user.isBlocked = true;
                 _userRepository.UpdateUser(user);
             }
 
-            return response;
+            return response.Successfull();
         }
 
         public IResponse AccountUpdate(int userId, string username, string emailaddress, string password)
