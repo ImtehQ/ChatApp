@@ -1,5 +1,13 @@
-﻿using ChatApp.Domain.Interfaces;
+﻿using ChatApp.Business.Core.Validator;
+using ChatApp.Domain.Enums;
+using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
+using ChatApp.Domain.Models;
+using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.Reports;
+using FluentResponses.Interfaces;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -12,47 +20,48 @@ namespace ChatApp.Business.Core.Services
             _messageRepository = messageRepository;
         }
 
-        //public IResponse GetAllMessages(int groupId, int pageNr)
-        //{
-        //    Response response = new Response(MethodCode.GetMessages, LayerCode.Service,
-        //       new object[] { groupId, pageNr });
+        public IResponse GetAllMessages(int groupId, int pageNr)
+        {
+            IResponse response = this.CreateResponse();
 
-        //    List<Message> messages = _messageRepository.GetMessages()
-        //        .Where(m => m.GroupId == groupId)
-        //        .Skip(((pageNr - 1) * 10))
-        //        .Take(10)
-        //        .ToList();
+            List<Message> messages = _messageRepository.GetMessages()
+                .Where(m => m.GroupId == groupId)
+                .Skip(((pageNr - 1) * 10))
+                .Take(10)
+                .ToList();
 
-        //    return response.Successfull(messages);
-        //}
+            response.Contents(messages);
+            return response.Successfull();
+        }
 
-        //public IResponse GetAllMessages(int groupId, int pageNr, string Query)
-        //{
-        //    Response response = new Response(MethodCode.GetMessages, LayerCode.Service,
-        //       new object[] { groupId, pageNr });
+        public IResponse GetAllMessages(int groupId, int pageNr, string Query)
+        {
+            IResponse response = this.CreateResponse();
 
-        //    List<Message> messages = _messageRepository.GetMessages()
-        //        .Where(m => m.GroupId == groupId && m.Content.Contains(Query))
-        //        .Skip(((pageNr - 1) * 10))
-        //        .Take(10).ToList();
+            List<Message> messages = _messageRepository.GetMessages()
+                .Where(m => m.GroupId == groupId && m.Content.Contains(Query))
+                .Skip(((pageNr - 1) * 10))
+                .Take(10).ToList();
 
-        //    return response.Successfull(messages);
-        //}
+            response.Contents(messages);
+            return response.Successfull();
+        }
 
-        //public IResponse SendMessage(string message, User sender, GroupTypeEnum groupType, int groupId)
-        //{
-        //    Response response = new Response(MethodCode.SendMessage, LayerCode.Service,
-        //        new object[] { message, sender, groupType, groupId });
+        public IResponse SendMessage(string message, User sender, GroupTypeEnum groupType, int groupId)
+        {
+            IResponse response = this.CreateResponse();
 
-        //    var messageValidator = MessageContentValidator.CheckContent(message);
-        //    if (messageValidator.Valid == false) return messageValidator;
+            response.Includes(MessageContentValidator.CheckContent(message));
+            if (response.LastIncluded().Status() == false)
+                return response.Failed();
 
-        //    Message m = new Message() { Content = message, SenderId = sender, GroupId = groupId };
-        //    _messageRepository.InsertMessage(m);
-        //    _messageRepository.Save();
+            Message m = new Message() { Content = message, SenderId = sender, GroupId = groupId };
+            _messageRepository.InsertMessage(m);
+            _messageRepository.Save();
 
-        //    return response.Successfull();
-        //}
+
+            return response.Successfull();
+        }
 
 
     }

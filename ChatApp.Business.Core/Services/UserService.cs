@@ -33,11 +33,7 @@ namespace ChatApp.Business.Core.Services
                 .Contents(_userRepository.GetUserByID(Id))
                 .CheckValidIfContentNotNull();
 
-            if (response.Status() == false)
-                response.Failed(Id, HttpStatusCode.NotFound);
-            else
-                response.Successfull();
-            return response;
+            return response.Return(httpStatusFailed: HttpStatusCode.NotFound);
         }
 
         public IResponse Login(string username, string password)
@@ -57,7 +53,7 @@ namespace ChatApp.Business.Core.Services
 
             response.Contents(_JWTAuthService.GetToken(user, _JWTToken));
 
-            return response;
+            return response.Successfull();
         }
 
         public IResponse Register(string name, string username, string emailaddress, string password)

@@ -80,6 +80,24 @@ namespace FluentResponses.Extensions.Reports
             return defaultReturnValue;
         }
 
+
+        public static IResponse Return(this IResponse response,
+            HttpStatusCode httpStatusSuccessfull = HttpStatusCode.OK,
+            HttpStatusCode httpStatusFailed = HttpStatusCode.BadRequest)
+        {
+            return response.ReturnCheck(response.Status(), httpStatusSuccessfull, httpStatusFailed);
+        }
+
+        public static IResponse ReturnCheck(this IResponse response, bool check,
+           HttpStatusCode httpStatusSuccessfull = HttpStatusCode.OK,
+           HttpStatusCode httpStatusFailed = HttpStatusCode.BadRequest)
+        {
+            if (check == true)
+                return response.Successfull(httpStatusSuccessfull);
+            else
+                return response.Failed(httpStatusFailed);
+        }
+
         public static IResponse Successfull(this IResponse response, HttpStatusCode httpStatus = HttpStatusCode.OK)
         {
             return response.Status(true).Code(httpStatus);

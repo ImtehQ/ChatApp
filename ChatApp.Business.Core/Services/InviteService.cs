@@ -4,6 +4,8 @@ using ChatApp.Domain.Models;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Interfaces;
 using FluentResponses.Interfaces;
+using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.Reports;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -16,31 +18,21 @@ namespace ChatApp.Business.Core.Services
             _InviteRepository = inviteRepository;
         }
 
-        //public IResponse GetInviteById(int inviteId)
-        //{
-        //    IResponse response = new Response(MethodCode.GetInviteById, LayerCode.Service, inviteId);
+        public IResponse GetInviteById(int inviteId)
+        {
+            IResponse response = this.CreateResponse();
+            response.Contents(_InviteRepository.GetInviteById(inviteId));
+            return response.Successfull();
+        }
 
-        //    return response.Successfull(_InviteRepository.GetInviteById(inviteId));
-        //}
+        public IResponse Register(Invite invite)
+        {
+            IResponse response = this.CreateResponse();
 
-        //public IResponse Register(Invite invite)
-        //{
-        //    IResponse response = new Response(MethodCode.GetInviteById, LayerCode.Service, invite);
+            _InviteRepository.Insert(invite);
+            _InviteRepository.Save();
 
-        //    _InviteRepository.Insert(invite);
-        //    _InviteRepository.Save();
-
-        //    return response.Successfull();
-        //}
-
-        //IResponse IInviteService.GetInviteById(int inviteId)
-        //{
-        //    throw new System.NotImplementedException();
-        //}
-
-        //IResponse IInviteService.Register(Invite invite)
-        //{
-        //    throw new System.NotImplementedException();
-        //}
+            return response.Successfull();
+        }
     }
 }

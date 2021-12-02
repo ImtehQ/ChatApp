@@ -7,6 +7,7 @@ using ChatApp.Business.Core.Extensions;
 using FluentResponses.Interfaces;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
+using ChatApp.Domain.Models;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -26,9 +27,10 @@ namespace ChatApp.API.MIP.Controllers
         [Authorize(AccountRoleEnum.RoleUser)]
         public IActionResult List(GroupTypeEnum groupType)
         {
-            IResponse response = this.CreateResponse().
-                Includes(_appService.List(HttpContext.User.GetUserID(), groupType));
-
+            IResponse response = this.CreateResponse();
+            User user = (User)HttpContext.Items["User"];
+            response.Includes(_appService.List(user, groupType));
+            response.Successfull();
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
@@ -39,6 +41,7 @@ namespace ChatApp.API.MIP.Controllers
         {
             IResponse response = this.CreateResponse().
                 Includes(_appService.Login(Username, Password));
+            response.Successfull();
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
@@ -58,6 +61,7 @@ namespace ChatApp.API.MIP.Controllers
         {
             IResponse response = this.CreateResponse().
                 Includes(_appService.AccountUpdate(id, Username, Emailaddress, Password));
+            response.Successfull();
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
@@ -68,6 +72,7 @@ namespace ChatApp.API.MIP.Controllers
         {
             IResponse response = this.CreateResponse().
                 Includes(_appService.BlockUser(userId));
+            response.Successfull();
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
     }

@@ -1,4 +1,7 @@
-﻿namespace ChatApp.Business.Core.Validator
+﻿using FluentResponses.Interfaces;
+using System;
+
+namespace ChatApp.Business.Core.Validator
 {
     public static class MessageContentValidator
     {
@@ -12,5 +15,9 @@
 
         //    return response.Successfull();
         //}
+        internal static IResponse CheckContent(string message)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

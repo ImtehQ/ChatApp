@@ -11,17 +11,11 @@ namespace ChatApp.Business.Core.AppServices
     //User
     public partial class AppService : IAppService
     {
-        public IResponse List(int userId, GroupTypeEnum groupType)
+        public IResponse List(User user, GroupTypeEnum groupType)
         {
-            IResponse response = this.CreateResponse().Includes(_UserService.GetUserById(userId));
-
-            if (response.LastIncluded().Status() == false) return response;
-
-            User user = response.LastIncluded().Contents<User>();
-
-            return response;
-            //return response.Includes(
-            //    _GroupUserService.GetAllUsersByGroupType(user, groupType));
+            return this.CreateResponse()
+                .Includes(_GroupUserService.GetAllUsersByGroupType(user, groupType))
+                .Successfull();
         }
 
         public IResponse Login(string Username, string Password)
@@ -33,7 +27,7 @@ namespace ChatApp.Business.Core.AppServices
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
             }
 
-            return response.Includes(_UserService.Login(Username, Password));
+            return response.Includes(_UserService.Login(Username, Password)).Successfull();
         }
 
         public IResponse Register(string Name, string Username, string Emailaddress, string Password)
@@ -46,8 +40,7 @@ namespace ChatApp.Business.Core.AppServices
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
             }
 
-            response.Includes(_UserService.Register(Name, Username, Emailaddress, Password));
-            return response.Successfull();
+            return response.Includes(_UserService.Register(Name, Username, Emailaddress, Password)).Successfull();
         }
 
         public IResponse AccountUpdate(int id, string Username, string Emailaddress, string Password)
@@ -60,7 +53,7 @@ namespace ChatApp.Business.Core.AppServices
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
             }
 
-            return response.Includes(_UserService.AccountUpdate(id, Username, Emailaddress, Password));
+            return response.Includes(_UserService.AccountUpdate(id, Username, Emailaddress, Password)).Successfull();
         }
 
         public IResponse BlockUser(int userId)
@@ -68,7 +61,7 @@ namespace ChatApp.Business.Core.AppServices
             IResponse response = this.CreateResponse();
             if (userId <= 0)
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
-            return response.Includes(_UserService.BlockUserById(userId));
+            return response.Includes(_UserService.BlockUserById(userId)).Successfull();
         }
     }
 }
