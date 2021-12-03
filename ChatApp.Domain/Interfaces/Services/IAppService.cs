@@ -14,13 +14,16 @@ namespace ChatApp.Domain.Interfaces.Services
         IResponse LoginUser(string Username, string Password);
         IResponse RegisterUser(string Name, string Username, string Emailaddress, string Password);
         //--------------
-        IResponse InviteGroup(User user, int InviteId);
+        IResponse InviteToGroup(User user, int InviteId);
         IResponse JoinGroup(User sender, int GroupId, int UserId, string Message);
         IResponse ListGroups(int GroupId, User user);
         IResponse RegisterGroup(int UserId, string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup);
         IResponse RegisterGroup(User user, string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup);
         IResponse RemoveGroup(int GroupId);
         IResponse RemoveUserFromGroup(int userId, int GroupId);
+        //--------------
+        IResponse PullMessages(int pageNr, int groupId);
+        IResponse SendMessage(string Message, User Sender, int Type, int TypeId);
         //--------------
     }
 }

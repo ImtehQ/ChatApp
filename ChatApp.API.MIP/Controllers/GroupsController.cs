@@ -30,9 +30,7 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult ListGroups(int groupId)
         {
             IResponse response = this.CreateResponse();
-            response
-                .Includes(_appService.ListGroups(groupId, HttpContext.GetUser()))
-                .LastIncluded();
+            response.Includes(_appService.ListGroups(groupId, HttpContext.GetUser()));
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
@@ -44,9 +42,7 @@ namespace ChatApp.API.MIP.Controllers
             GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
             IResponse response = this.CreateResponse();
-
             response.Includes(_appService.RegisterGroup(HttpContext.GetUser(), Name, Password, MaxUsers, Visibility, GroupType));
-
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
@@ -57,7 +53,7 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult InviteGroup(int inviteId)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.InviteGroup(HttpContext.GetUser(), inviteId));
+            response.Includes(_appService.InviteToGroup(HttpContext.GetUser(), inviteId));
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 

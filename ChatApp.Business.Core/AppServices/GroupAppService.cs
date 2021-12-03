@@ -42,7 +42,7 @@ namespace ChatApp.Business.Core.AppServices
         }
 
 
-        public IResponse InviteGroup(User user, int inviteId)
+        public IResponse InviteToGroup(User user, int inviteId)
         {
             IResponse response = this.CreateResponse();
 

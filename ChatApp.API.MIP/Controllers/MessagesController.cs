@@ -1,4 +1,10 @@
-﻿using ChatApp.Domain.Interfaces.Services;
+﻿using ChatApp.API.MIP.HttpContextExtensions;
+using ChatApp.Business.Core.AppServices;
+using ChatApp.Domain.Enums;
+using ChatApp.Domain.Interfaces.Services;
+using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.Reports;
+using FluentResponses.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,49 +15,29 @@ namespace ChatApp.API.MIP.Controllers
     [Route("messages")]
     public class MessagesController : ControllerBase
     {
-        IMessageService _MessageService { get; set; }
-        IUserService _UserService { get; set; }
+        IAppService _appService;
 
-        public MessagesController(IMessageService MessageService, IUserService userService)
+        public MessagesController(IAppService appService)
         {
-            _MessageService = MessageService;
-            _UserService = userService;
+            _appService = appService;
         }
 
-        //[HttpPost]
-        //[Route("messages")]
-        //public IActionResult SendMessage(string Message, int Sender, int Type, int TypeId)
-        //{
-        //    if (string.IsNullOrEmpty(Message) || Sender < 0 || Type < 0 || TypeId < 0)
-        //    {
-        //        return BadRequest("IsNullOrEmpty");
-        //    }
+        [HttpPost]
+        [Route("messages")]
+        public IActionResult SendMessage(string Message, int Sender, int Type, int TypeId)
+        {
+            IResponse response = this.CreateResponse();
+            response.Includes(_appService.SendMessage(Message, HttpContext.GetUser(), Type, TypeId));
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
+        }
 
-        //    User user = _UserService.GetUserById(Sender);
-        //    if(user == null)
-        //    {
-        //        return BadRequest("IsNullOrEmpty");
-        //    }
-
-        //    IResponse _result = _MessageService.SendMessage(Message, user, (GroupTypeEnum)Type, TypeId);
-
-        //    return StatusCode((int)_result.Code, _result);
-        //}
-
-        //[HttpGet]
-        //[Route("messages")]
-        //public IActionResult PullMessages(int pageNr, GroupTypeEnum groupType, int groupId)
-        //{
-        //    if (groupId < 0)
-        //    {
-        //        return BadRequest("IsNullOrEmpty");
-        //    }
-
-        //    IResponse _result = _MessageService.GetAllMessages(groupId, pageNr);
-
-        //    return StatusCode((int)_result.Code, _result);
-
-
-        //}
+        [HttpGet]
+        [Route("messages")]
+        public IActionResult PullMessages(int pageNr, GroupTypeEnum groupType, int groupId)
+        {
+            IResponse response = this.CreateResponse();
+            response.Includes(_appService.PullMessages(pageNr, groupId));
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
+        }
     }
 }
