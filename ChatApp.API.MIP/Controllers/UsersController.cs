@@ -8,6 +8,8 @@ using FluentResponses.Interfaces;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
 using ChatApp.Domain.Models;
+using FluentResponses.TraceExtensions;
+using ChatApp.API.MIP.HttpContextExtensions;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -25,11 +27,10 @@ namespace ChatApp.API.MIP.Controllers
         [HttpGet]
         [Route("/api/list")]
         [Authorize(AccountRoleEnum.RoleUser)]
-        public IActionResult List(GroupTypeEnum groupType)
+        public IActionResult ListUsers(GroupTypeEnum groupType)
         {
             IResponse response = this.CreateResponse();
-            User user = (User)HttpContext.Items["User"];
-            response.Includes(_appService.List(user, groupType));
+            response.Includes(_appService.ListUsers(HttpContext.GetUser(), groupType));
             response.Successfull();
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
@@ -37,10 +38,10 @@ namespace ChatApp.API.MIP.Controllers
         [HttpPost]
         [AllowAnonymous]
         [Route("token/")]
-        public IActionResult Login(string Username, string Password)
+        public IActionResult LoginUser(string Username, string Password)
         {
             IResponse response = this.CreateResponse().
-                Includes(_appService.Login(Username, Password));
+                Includes(_appService.LoginUser(Username, Password));
             response.Successfull();
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
@@ -48,19 +49,20 @@ namespace ChatApp.API.MIP.Controllers
         [HttpGet]
         [AllowAnonymous]
         [Route("reg/")]
-        public IActionResult Register(string Name, string Username, string Emailaddress, string Password)
+        public IActionResult RegisterUser(string Name, string Username, string Emailaddress, string Password)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.Register(Name, Username, Emailaddress, Password));
+            response.Includes(
+                _appService.RegisterUser(Name, Username, Emailaddress, Password));
             response.Successfull();
             return StatusCode((int)response.Code(), response.TraceCodes());
         }
 
         [HttpPut]
-        public IActionResult AccountUpdate(int id, string Username, string Emailaddress, string Password)
+        public IActionResult AccountUpdateUser(int id, string Username, string Emailaddress, string Password)
         {
             IResponse response = this.CreateResponse().
-                Includes(_appService.AccountUpdate(id, Username, Emailaddress, Password));
+                Includes(_appService.AccountUpdateUser(id, Username, Emailaddress, Password));
             response.Successfull();
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
@@ -68,7 +70,7 @@ namespace ChatApp.API.MIP.Controllers
         [HttpGet]
         [Route("block/{userId}")]
         [Authorize(AccountRoleEnum.RoleModerator)]
-        public IActionResult Block(int userId)
+        public IActionResult BlockUser(int userId)
         {
             IResponse response = this.CreateResponse().
                 Includes(_appService.BlockUser(userId));

@@ -3,6 +3,7 @@ using ChatApp.Domain.Enums.ResponseCodes;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,133 +12,110 @@ namespace ChatApp.Business.Core.AppServices
     //Group
     public partial class AppService : IAppService
     {
-        public IResponse List(int GroupId, int UserId)
+        public IResponse ListGroupsFromUser(User user)
         {
-            IResponse response = this.CreateResponse().Includes(_UserService.GetUserById(UserId));
-
-            _GroupUserService.GetGroupsByUser(UserResponse.Contents<User>()
+            return this.CreateResponse().Includes(_GroupUserService.GetGroupsByUser(user)).Successfull();
         }
 
-        public IResponse Register(int UserId, string Name, string Password, int MaxUsers = 0,
+        public IResponse ListGroups(int GroupId, int UserId)
+        {
+            IResponse response = this.CreateResponse();
+            User user = response.Includes(_UserService.GetUserById(UserId)).LastIncluded().Contents<User>();
+            _GroupUserService.GetGroupsByUser(user);
+            return response.Successfull();
+        }
+
+        public IResponse RegisterGroup(User user, string Name, string Password, int MaxUsers = 0,
             GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic,
             GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
-            IResponse response = new Response(MethodCode.Register, LayerCode.Service, Name);
+            IResponse response = this.CreateResponse();
 
-            IResponse UserResponse = _UserService.GetUserById(UserId);
-            response.Link(UserResponse);
-            if (UserResponse.Valid == false) return response;
+            if (response.LastIncluded().Status() == false) return response.Failed();
 
-            IResponse GroupResponse = _GroupService.Create(Name, Password, MaxUsers, Visibility, GroupType);
-            response.Link(GroupResponse);
-            if (GroupResponse.Valid == false) return response;
+            Group group = response.Includes(_GroupService.Create(Name, Password, MaxUsers, Visibility, GroupType)).LastIncluded().Contents<Group>();
 
-            return response.Link(_GroupUserService.Insert(
-                UserResponse.GetResponseObject<User>(),
-                GroupResponse.GetResponseObject<Group>(),
-                AccountRoleEnum.RoleAdmin));
+            if (response.LastIncluded().Status() == false) return response.Failed();
+
+            return response.Includes(_GroupUserService.Insert(
+                user, group, AccountRoleEnum.RoleAdmin)).Successfull();
         }
 
 
-        public IResponse Invite(int UserId, int InviteId)
+        public IResponse InviteGroup(User user, int inviteId)
         {
             IResponse response = this.CreateResponse();
 
+            Invite invite = response.Includes(_InviteService.GetInviteById(inviteId)).LastIncluded().Contents<Invite>();
+            if (response.LastIncluded().Status() == false) return response.Failed();
 
+            Group group = response.Includes(_GroupService.GetGroupById(invite.GroupId)).LastIncluded().Contents<Group>();
+            if (response.LastIncluded().Status() == false) return response.Failed();
 
+            response.Includes(_GroupUserService.Insert(
+                user, group, AccountRoleEnum.RoleUser));
+            if (response.LastIncluded().Status() == false) return response.Failed();
 
-
-            IResponse res = new Bfet(response, MethodCode.Invite, LayerCode.Service, null);
-
-
-            IResponse UserResponse = _UserService.GetUserById(UserId);
-            response.Link(UserResponse);
-
-
-
-            if (UserResponse.Valid == false) return response;
-
-            IResponse InviteResponse = _InviteService.GetInviteById(InviteId);
-            response.Link(InviteResponse);
-            if (InviteResponse.Valid == false) return response;
-
-            IResponse GroupResponse = _GroupService.GetGroupById(InviteResponse.GetResponseObject<Invite>().GroupId);
-            response.Link(GroupResponse);
-            if (GroupResponse.Valid == false) return response;
-
-            IResponse GroupUserResponse = _GroupUserService.Insert(
-                UserResponse.GetResponseObject<User>(),
-                GroupResponse.GetResponseObject<Group>(),
-                AccountRoleEnum.RoleUser);
-            response.Link(GroupResponse);
-            if (GroupResponse.Valid == false) return response;
-
-            return response;
+            return response.Successfull();
         }
 
-        public IActionResult Join(int GroupId, int UserId, string Message)
+        public IResponse JoinGroup(User sender, int GroupId, int UserId, string Message)
         {
-            return appService.Join(int GroupId, int UserId, string Message);
+            IResponse response = this.CreateResponse();
 
-            User User = _UserService.GetUserById(UserId).GetResponseObject<User>();
+            User user = response.Includes(_UserService.GetUserById(UserId)).LastIncluded().Contents<User>();
 
-            User senderUser = _UserService.GetUserById(HttpContext.User.GetUserID()).GetResponseObject<User>();
+            Group group = response.Includes(_GroupService.Create("Invite chat", "", 2,
+                GroupVisibilityEnum.OptionPrivate, GroupTypeEnum.OptionPrivate)).LastIncluded().Contents<Group>();
 
-            Group group = _GroupService.Create("Invite chat", "", 2,
-                GroupVisibilityEnum.OptionPrivate, GroupTypeEnum.OptionPrivate).GetResponseObject<Group>();
+            response.Includes(_GroupUserService.Join(group, sender, AccountRoleEnum.RoleAdmin));
 
-            _GroupUserService.Join(group, senderUser, AccountRoleEnum.RoleAdmin);
+            response.Includes(_GroupUserService.Join(group, user, AccountRoleEnum.RoleUser));
 
-            _GroupUserService.Join(group, User, AccountRoleEnum.RoleUser);
 
             Invite invite = new Invite() { GroupId = group.GroupId, Message = Message };
 
-            _InviteService.Register(invite);
+            response.Includes(_InviteService.Register(invite));
 
-            _MessageService.SendMessage(Message, senderUser, GroupTypeEnum.OptionPrivate, group.GroupId);
-            _MessageService.SendMessage($"Invite: {invite.Id}", senderUser, GroupTypeEnum.OptionPrivate, group.GroupId);
+            response.Includes(_MessageService.SendMessage(Message, sender, GroupTypeEnum.OptionPrivate, group.GroupId));
+            response.Includes(_MessageService.SendMessage($"Invite: {invite.Id}", sender, GroupTypeEnum.OptionPrivate, group.GroupId));
 
-            return Ok("Not implimantata");
+            return response.Successfull();
         }
 
         public IResponse RemoveGroup(int GroupId)
         {
-            IResponse response = new Response(MethodCode.Invite, LayerCode.Service, GroupId);
+            IResponse response = this.CreateResponse();
 
-            IResponse GroupResponse = _GroupService.GetGroupById(GroupId);
-            response.Link(GroupResponse);
-            if (GroupResponse.Valid == false) return response;
+            Group group = response.Includes(_GroupService.GetGroupById(GroupId)).LastIncluded().Contents<Group>();
+            if (response.LastIncluded().Status() == false) return response.Failed();
 
-            IResponse GroupUserResponse = _GroupUserService.RemoveGroup(GroupResponse.GetResponseObject<Group>());
-            response.Link(GroupUserResponse);
-            if (GroupUserResponse.Valid == false) return response;
+            response.Includes(_GroupUserService.RemoveGroup(group));
+            if (response.LastIncluded().Status() == false) return response.Failed();
 
-            IResponse GroupRemoveResponse = _GroupService.RemoveGroup(GroupId);
-            response.Link(GroupRemoveResponse);
-            if (GroupRemoveResponse.Valid == false) return response;
+            response.Includes(_GroupService.RemoveGroup(GroupId));
+            if (response.LastIncluded().Status() == false) return response.Failed();
 
-            return response;
+            return response.Successfull();
         }
 
-        public IActionResult RemoveUser(int userId, int GroupId)
+        public IResponse RemoveUserFromGroup(User user, int groupId)
         {
-            Group group = _GroupService.GetGroupById(GroupId).GetResponseObject<Group>();
-            if (group == null)
-                return NotFound("Group");
+            IResponse response = this.CreateResponse();
 
-            User user = _UserService.GetUserById(userId).GetResponseObject<User>();
-            if (user == null)
-                return NotFound("User");
+            Group group = response.Includes(_GroupService.GetGroupById(groupId)).LastIncluded().Contents<Group>();
+            if (response.LastIncluded().Status() == false) return response.Failed();
 
-            if ((int)_GroupUserService.GetAccountRoleByUser(user, group)
-                .GetResponseObject<AccountRoleEnum>() < (int)AccountRoleEnum.RoleModerator)
+            AccountRoleEnum userAccountRole = response.Includes(_GroupUserService.GetAccountRoleByUser(user, group))
+                .LastIncluded().Contents<AccountRoleEnum>();
+            if ((int)userAccountRole < (int)AccountRoleEnum.RoleModerator)
             {
-                return StatusCode(404);
+                return response.Failed(null, System.Net.HttpStatusCode.Unauthorized);
             }
 
-            _GroupUserService.RemoveUser(user, group);
+            response.Includes(_GroupUserService.RemoveUser(user, group));
 
-            return Ok();
+            return response.Successfull();
         }
     }
 }

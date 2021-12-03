@@ -8,6 +8,8 @@ using ChatApp.Business.Core.Extensions;
 using FluentResponses.Interfaces;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
+using FluentResponses.TraceExtensions;
+using ChatApp.API.MIP.HttpContextExtensions;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -25,79 +27,48 @@ namespace ChatApp.API.MIP.Controllers
         [HttpGet]
         [Route("list")]
         [Authorize(AccountRoleEnum.RoleUser)]
-        public IActionResult List(int GroupId)
+        public IActionResult ListGroups(int groupId)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.GetUserById(HttpContext.User.GetUserID());
-            User user = response.LastIncluded().Contents<User>();
-            response.Includes(_appService.GetGroupsByUser(user));
-            response.Successfull();
-            return Ok();
+            response
+                .Includes(_appService.ListGroups(groupId, HttpContext.GetUser()))
+                .LastIncluded();
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
         [HttpPost]
         [Route("groups")]
         [Authorize(AccountRoleEnum.RoleUser)]
-        public IActionResult Register(string Name, string Password, int MaxUsers = 0,
+        public IActionResult RegisterGroup(string Name, string Password, int MaxUsers = 0,
             GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic,
             GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
-            User user = _UserService.GetUserById(HttpContext.User.GetUserID()).GetResponseObject<User>();
-            Group group = _GroupService.Create(Name, Password, MaxUsers, Visibility, GroupType).GetResponseObject<Group>();
+            IResponse response = this.CreateResponse();
 
-            _GroupUserService.Insert(user, group, AccountRoleEnum.RoleAdmin);
+            response.Includes(_appService.RegisterGroup(HttpContext.GetUser(), Name, Password, MaxUsers, Visibility, GroupType));
 
-            return Ok("Reponse not implemented");
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
 
         [HttpPost]
         [Route("groups/join")]
         [Authorize(AccountRoleEnum.RoleUser)]
-        public IActionResult Invite(int inviteId)
+        public IActionResult InviteGroup(int inviteId)
         {
-            User user = _UserService.GetUserById(HttpContext.User.GetUserID()).GetResponseObject<User>();
-
-            Invite invite = _InviteService.GetInviteById(inviteId).GetResponseObject<Invite>();
-            if (invite == null)
-                return BadRequest("Invite not valid");
-
-            Group group = _GroupService.GetGroupById(invite.GroupId).GetResponseObject<Group>();
-
-            if (group == null)
-                return BadRequest("Invite not valid");
-
-            _GroupUserService.Insert(user, group, AccountRoleEnum.RoleUser);
-
-            return Ok();
+            IResponse response = this.CreateResponse();
+            response.Includes(_appService.InviteGroup(HttpContext.GetUser(), inviteId));
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
         [HttpPost]
         [Route("groups/join")]
         [Authorize(AccountRoleEnum.RoleUser)] // Missing group id so no idea where you need to be rolemod for...
-        public IActionResult Join(int GroupId, int UserId, string Message)
+        public IActionResult JoinGroup(int GroupId, int UserId, string Message)
         {
-            return appService.Join(int GroupId, int UserId, string Message);
-
-            User User = _UserService.GetUserById(UserId).GetResponseObject<User>();
-
-            User senderUser = _UserService.GetUserById(HttpContext.User.GetUserID()).GetResponseObject<User>();
-
-            Group group = _GroupService.Create("Invite chat", "", 2,
-                GroupVisibilityEnum.OptionPrivate, GroupTypeEnum.OptionPrivate).GetResponseObject<Group>();
-
-            _GroupUserService.Join(group, senderUser, AccountRoleEnum.RoleAdmin);
-
-            _GroupUserService.Join(group, User, AccountRoleEnum.RoleUser);
-
-            Invite invite = new Invite() { GroupId = group.GroupId, Message = Message };
-
-            _InviteService.Register(invite);
-
-            _MessageService.SendMessage(Message, senderUser, GroupTypeEnum.OptionPrivate, group.GroupId);
-            _MessageService.SendMessage($"Invite: {invite.Id}", senderUser, GroupTypeEnum.OptionPrivate, group.GroupId);
-
-            return Ok("Not implimantata");
+            IResponse response = this.CreateResponse();
+            response.Includes(_appService.JoinGroup(HttpContext.GetUser(), GroupId, UserId, Message));
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
         [HttpPost]
@@ -105,38 +76,19 @@ namespace ChatApp.API.MIP.Controllers
         [Authorize(AccountRoleEnum.RoleUser)]
         public IActionResult RemoveGroup(int GroupId)
         {
-            Group group = _GroupService.GetGroupById(GroupId).GetResponseObject<Group>();
-            if (group == null)
-                return NotFound("Group");
-
-            _GroupUserService.RemoveGroup(group);
-            _GroupService.RemoveGroup(group.GroupId);
-
-            return Ok();
+            IResponse response = this.CreateResponse();
+            response.Includes(_appService.RemoveGroup(GroupId));
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
         [HttpPost]
         [Route("groups/remove")]
         [Authorize(AccountRoleEnum.RoleUser)]
-        public IActionResult RemoveUser(int userId, int GroupId)
+        public IActionResult RemoveUserFromGroup(int userId, int GroupId)
         {
-            Group group = _GroupService.GetGroupById(GroupId).GetResponseObject<Group>();
-            if (group == null)
-                return NotFound("Group");
-
-            User user = _UserService.GetUserById(userId).GetResponseObject<User>();
-            if (user == null)
-                return NotFound("User");
-
-            if ((int)_GroupUserService.GetAccountRoleByUser(user, group)
-                .GetResponseObject<AccountRoleEnum>() < (int)AccountRoleEnum.RoleModerator)
-            {
-                return StatusCode(404);
-            }
-
-            _GroupUserService.RemoveUser(user, group);
-
-            return Ok();
+            IResponse response = this.CreateResponse();
+            response.Includes(_appService.RemoveUserFromGroup(userId, GroupId));
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
     }
 

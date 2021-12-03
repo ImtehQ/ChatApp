@@ -42,27 +42,6 @@ namespace FluentResponses.Extensions.Reports
             return response.Report();
         }
 
-        public static string FullTrace(this IResponse response)
-        {
-            return "Nothing here yet!";
-        }
-
-        public static List<HttpStatusCode> TraceCodes(this IResponse response)
-        {
-            List<HttpStatusCode> codes = new List<HttpStatusCode>();
-            var responses = response.Includes();
-            if(responses.Count > 0)
-            {
-                codes.Add(response.Code());
-                foreach (var item in responses)
-                {
-                    codes.AddRange(item.TraceCodes());
-                }
-            }
-            return codes;
-        }
-
-
         public static bool ReportStatus(this Response response, bool FalloutIfFalse, bool defaultReturnValue = true)
         {
             if (response.Status() == false && FalloutIfFalse)

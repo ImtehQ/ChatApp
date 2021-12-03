@@ -11,14 +11,18 @@ namespace ChatApp.Business.Core.AppServices
     //User
     public partial class AppService : IAppService
     {
-        public IResponse List(User user, GroupTypeEnum groupType)
+        public IResponse GetUserById(int userId)
+        {
+            return this.CreateResponse().Includes(_UserService.GetUserById(userId)).Successfull();
+        }
+        public IResponse ListUsers(User user, GroupTypeEnum groupType)
         {
             return this.CreateResponse()
                 .Includes(_GroupUserService.GetAllUsersByGroupType(user, groupType))
                 .Successfull();
         }
 
-        public IResponse Login(string Username, string Password)
+        public IResponse LoginUser(string Username, string Password)
         {
             IResponse response = this.CreateResponse();
 
@@ -30,7 +34,7 @@ namespace ChatApp.Business.Core.AppServices
             return response.Includes(_UserService.Login(Username, Password)).Successfull();
         }
 
-        public IResponse Register(string Name, string Username, string Emailaddress, string Password)
+        public IResponse RegisterUser(string Name, string Username, string Emailaddress, string Password)
         {
             IResponse response = this.CreateResponse();
 
@@ -43,7 +47,7 @@ namespace ChatApp.Business.Core.AppServices
             return response.Includes(_UserService.Register(Name, Username, Emailaddress, Password)).Successfull();
         }
 
-        public IResponse AccountUpdate(int id, string Username, string Emailaddress, string Password)
+        public IResponse AccountUpdateUser(int id, string Username, string Emailaddress, string Password)
         {
             IResponse response = this.CreateResponse();
 
@@ -62,6 +66,21 @@ namespace ChatApp.Business.Core.AppServices
             if (userId <= 0)
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
             return response.Includes(_UserService.BlockUserById(userId)).Successfull();
+        }
+
+        public IResponse ListGroups(int GroupId, User user)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IResponse RegisterGroup(int UserId, string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IResponse RemoveUserFromGroup(int userId, int GroupId)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -7,6 +7,7 @@ using FluentResponses;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
+using System.Linq;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -20,6 +21,11 @@ namespace ChatApp.Business.Core.Services
             _GroupRepository = groupRepository;
         }
 
+        public IResponse Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public IResponse GetGroupById(int groupId)
         {
             IResponse response = this.CreateResponse();
@@ -28,7 +34,7 @@ namespace ChatApp.Business.Core.Services
             return response.Successfull();
         }
 
-        public IResponse Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
+        public IResponse Register(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
             IResponse response = this.CreateResponse();
             Group group = new Group()
@@ -39,7 +45,7 @@ namespace ChatApp.Business.Core.Services
                 Password = Password,
                 type = GroupType
             };
-
+            response.Contents(group);
             _GroupRepository.InsertGroup(group);
             _GroupRepository.Save();
 

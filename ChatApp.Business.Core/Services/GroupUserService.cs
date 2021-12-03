@@ -29,7 +29,7 @@ namespace ChatApp.Business.Core.Services
                 .Where(u => u.Id == user.UserId)
                 .Select(x => x.Group).ToList()).Successfull();
         }
-        public IResponse Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup)
+        public IResponse AddGroupUser(User user, Group group, AccountRoleEnum accountRoleWithinGroup)
         {
             _GroupUserRepository.Insert(user, group, accountRoleWithinGroup);
             _GroupUserRepository.Save();
@@ -89,6 +89,11 @@ namespace ChatApp.Business.Core.Services
             var accountRole = _GroupUserRepository.GetGroupUser(user, group).AccountRole;
             response.Contents(accountRole);
             return response.Successfull();
+        }
+
+        public IResponse Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

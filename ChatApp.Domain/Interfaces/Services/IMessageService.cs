@@ -6,6 +6,6 @@ namespace ChatApp.Domain.Interfaces.Services
 {
     public interface IMessageService
     {
-     
+        IResponse SendMessage(string message, User sender, GroupTypeEnum groupType, int groupId);
     }
 }
