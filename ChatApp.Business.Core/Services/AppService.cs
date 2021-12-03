@@ -39,26 +39,4 @@ namespace ChatApp.Business.Core.AppServices
             _InviteService = inviteService;
         }
     }
-
-
-
-
-
-    //GroupUser
-    public partial class AppService : IAppService
-    {
-
-    }
-
-    //Messages
-    public partial class AppService : IAppService
-    {
-
-    }
-
-    //Invites
-    public partial class AppService : IAppService
-    {
-
-    }
 }
