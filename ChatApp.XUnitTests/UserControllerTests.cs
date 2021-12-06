@@ -13,6 +13,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
+using ChatApp.Business.Core.Services;
+using ChatApp.Domain.Interfaces;
+using ChatApp.Domain.Interfaces.Repositorys;
+using ChatApp.Business.Core.Repositorys;
+using ChatApp.Business.Core.Authentication;
+using ChatApp.Business.Core.AppServices;
+using Microsoft.Extensions.Options;
+using FluentResponses.TraceExtensions;
 
 namespace ChatApp.XUnitTests
 {
@@ -21,24 +29,54 @@ namespace ChatApp.XUnitTests
         User user;
         GroupTypeEnum groupType;
 
-        IAppService _appService;
+        IGroupService GroupService;
+        IUserService userService;
+        IGroupUserService groupUserService;
+        IMessageService messageService;
+        IInviteService inviteService;
+        IAppService appService;
 
+        Mock<IGroupRepository> groupRepository;
+        Mock<IUserRepository> userRepository;
+        Mock<IGroupUserRepository> userGroupRepository;
+        Mock<IMessageRepository> messageRepository;
+        Mock<IInviteRepository> inviteRepository;
 
-        [Fact]
-        public void GetUserListByGroupType()
+        private void GetMocks()
         {
-            // Create the mock
-            var mock = new Mock<IAppService>();
+            groupRepository = new Mock<IGroupRepository>();
+            userRepository = new Mock<IUserRepository>();
+            userGroupRepository = new Mock<IGroupUserRepository>();
+            messageRepository = new Mock<IMessageRepository>();
+            inviteRepository = new Mock<IInviteRepository>();
 
-            // Configure the mock to do something
-            mock.SetupGet(x => x.ListUsers).Returns(this.CreateResponse());
+            var iJWTAuthService = new Mock<IJWTAuthService>();
 
-            // Demonstrate that the configuration works
-            Assert.AreEqual("FixedValue", mock.Object.PropertyToMock);
+            var JWT = new Mock<IOptions<JWTToken>>();
 
-            // Verify that the mock was invoked
-            mock.VerifyGet(x => x.PropertyToMock);
+            GroupService = new GroupService(groupRepository.Object);
+            userService = new UserService(userRepository.Object, JWT.Object, iJWTAuthService.Object);
+            groupUserService = new GroupUserService(userGroupRepository.Object);
+            messageService = new MessageService(messageRepository.Object);
+            inviteService = new InviteService(inviteRepository.Object);
 
+            appService = new AppService(GroupService, userService, groupUserService, messageService, inviteService);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        public void GetUserById(int id)
+        {
+            GetMocks();
+
+            IResponse response = this.CreateResponse();
+            userRepository.CallBase = true;
+            userRepository.Setup(x => x.GetUserByID(id)).Returns(new User() { UserName = "testUser" });
+
+            response.Includes(userService.GetUserById(id));
+            User testUser = response.LastIncluded().Contents<User>();
+
+            Assert.Equal("testUser", testUser.UserName);
         }
     }
 }
