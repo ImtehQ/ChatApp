@@ -3,6 +3,7 @@ using ChatApp.Domain.Interfaces.Repositorys;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.MarkExtentions;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace ChatApp.Business.Core.Services
         {
             IResponse response = this.CreateResponse();
 
-            return response.Contents(_GroupUserRepository.GetGroupUsers()
+            return response.SetAttachment(_GroupUserRepository.GetGroupUsers()
                 .Where(u => u.Id == user.UserId)
                 .Select(x => x.Group).ToList()).Successfull();
         }
@@ -54,7 +55,7 @@ namespace ChatApp.Business.Core.Services
 
             var something = Users.Select(u => new { userId = u.User.UserId, role = u.AccountRole });
 
-            response.Contents(Users);
+            response.SetAttachment(Users);
 
             if (Users.Count > 0)
                 return response.Successfull(HttpStatusCode.OK);
@@ -86,7 +87,7 @@ namespace ChatApp.Business.Core.Services
         {
             IResponse response = this.CreateResponse();
             var accountRole = _GroupUserRepository.GetGroupUser(user, group).AccountRole;
-            response.Contents(accountRole);
+            response.SetAttachment(accountRole);
             return response.Successfull();
         }
 

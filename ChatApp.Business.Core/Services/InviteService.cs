@@ -4,6 +4,7 @@ using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
+using FluentResponses.Extensions.MarkExtentions;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -19,7 +20,7 @@ namespace ChatApp.Business.Core.Services
         public IResponse GetInviteById(int inviteId)
         {
             IResponse response = this.CreateResponse();
-            response.Contents(_InviteRepository.GetInviteById(inviteId));
+            response.SetAttachment(_InviteRepository.GetInviteById(inviteId));
             return response.Successfull();
         }
 

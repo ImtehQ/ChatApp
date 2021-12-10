@@ -7,6 +7,7 @@ using FluentResponses.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AuthorizeAttribute = ChatApp.Business.Core.Authentication.AuthorizeAttribute;
+using FluentResponses.Extensions.MarkExtentions;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -29,11 +30,11 @@ namespace ChatApp.API.MIP.Controllers
             IResponse response = this.CreateResponse();
 
 
-            response.Includes(_appService.ListUsers(HttpContext.GetUser(), groupType));
+            response.Include(_appService.ListUsers(HttpContext.GetUser(), groupType));
 
 
             response.Successfull();
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpPost]
@@ -42,9 +43,9 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult LoginUser(string Username, string Password)
         {
             IResponse response = this.CreateResponse().
-                Includes(_appService.LoginUser(Username, Password));
+                Include(_appService.LoginUser(Username, Password));
             response.Successfull();
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpGet]
@@ -53,19 +54,19 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult RegisterUser(string Name, string Username, string Emailaddress, string Password)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(
+            response.Include(
                 _appService.RegisterUser(Name, Username, Emailaddress, Password));
             response.Successfull();
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpPut]
         public IActionResult AccountUpdateUser(int id, string Username, string Emailaddress, string Password)
         {
             IResponse response = this.CreateResponse().
-                Includes(_appService.AccountUpdateUser(id, Username, Emailaddress, Password));
+                Include(_appService.AccountUpdateUser(id, Username, Emailaddress, Password));
             response.Successfull();
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpGet]
@@ -74,9 +75,9 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult BlockUser(int userId)
         {
             IResponse response = this.CreateResponse().
-                Includes(_appService.BlockUser(userId));
+                Include(_appService.BlockUser(userId));
             response.Successfull();
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
     }
 }

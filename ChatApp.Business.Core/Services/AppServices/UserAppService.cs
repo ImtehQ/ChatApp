@@ -2,6 +2,7 @@
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.MarkExtentions;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using System.Net;
@@ -13,13 +14,12 @@ namespace ChatApp.Business.Core.AppServices
     {
         public IResponse GetUserById(int userId)
         {
-            return this.CreateResponse().Includes(_UserService.GetUserById(userId)).ReturnCheckStatusLast();
+            return this.CreateResponse().Include(_UserService.GetUserById(userId));
         }
         public IResponse ListUsers(User user, GroupTypeEnum groupType)
         {
             return this.CreateResponse()
-                .Includes(_GroupUserService.GetAllUsersByGroupType(user, groupType))
-                .ReturnCheckStatusLast();
+                .Include(_GroupUserService.GetAllUsersByGroupType(user, groupType));
         }
 
         public IResponse LoginUser(string username, string password)
@@ -31,7 +31,7 @@ namespace ChatApp.Business.Core.AppServices
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
             }
 
-            return response.Includes(_UserService.Login(username, password)).ReturnCheckStatusLast();
+            return response.Include(_UserService.Login(username, password));
         }
 
         public IResponse RegisterUser(string name, string username, string emailaddress, string password)
@@ -39,15 +39,15 @@ namespace ChatApp.Business.Core.AppServices
             IResponse response = this.CreateResponse();
 
             if (string.IsNullOrEmpty(name))
-                return response.Failed(new { message = name + " is empty", name }, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "name is empty", HttpStatusCode.NotAcceptable);
             if (string.IsNullOrEmpty(username))
-                return response.Failed(new { message = username + " is empty", username }, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "username is empty", HttpStatusCode.NotAcceptable);
             if (string.IsNullOrEmpty(emailaddress))
-                return response.Failed(new { message = emailaddress + " is empty", emailaddress }, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "emailaddress is empty", HttpStatusCode.NotAcceptable);
             if (string.IsNullOrEmpty(password))
-                return response.Failed(new { message = password + " is empty", password }, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "password is empty", HttpStatusCode.NotAcceptable);
 
-            return response.Includes(_UserService.Register(name, username, emailaddress, password)).ReturnCheckStatusLast();
+            return response.Include(_UserService.Register(name, username, emailaddress, password));
         }
 
         public IResponse AccountUpdateUser(int id, string username, string emailaddress, string password)
@@ -60,7 +60,7 @@ namespace ChatApp.Business.Core.AppServices
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
             }
 
-            return response.Includes(_UserService.AccountUpdate(id, username, emailaddress, password)).ReturnCheckStatusLast();
+            return response.Include(_UserService.AccountUpdate(id, username, emailaddress, password));
         }
 
         public IResponse BlockUser(int userId)
@@ -68,7 +68,7 @@ namespace ChatApp.Business.Core.AppServices
             IResponse response = this.CreateResponse();
             if (userId <= 0)
                 return response.Failed(System.Net.HttpStatusCode.BadRequest);
-            return response.Includes(_UserService.BlockUserById(userId)).ReturnCheckStatusLast();
+            return response.Include(_UserService.BlockUserById(userId));
         }
 
         public IResponse ListGroups(int groupId, User user)

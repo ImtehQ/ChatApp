@@ -5,6 +5,7 @@ using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
+using FluentResponses.Extensions.MarkExtentions;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -27,7 +28,7 @@ namespace ChatApp.Business.Core.Services
         {
             IResponse response = this.CreateResponse();
             var group = _GroupRepository.GetGroupByID(groupId);
-            response.Contents(group);
+            response.SetAttachment(group);
             return response.Successfull();
         }
 
@@ -42,7 +43,7 @@ namespace ChatApp.Business.Core.Services
                 Password = password,
                 type = groupType
             };
-            response.Contents(group);
+            response.SetAttachment(group);
             _GroupRepository.InsertGroup(group);
             _GroupRepository.Save();
 

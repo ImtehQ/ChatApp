@@ -26,8 +26,8 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult ListGroups(int groupId)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.ListGroups(groupId, HttpContext.GetUser()));
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            response.Include(_appService.ListGroups(groupId, HttpContext.GetUser()));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpPost]
@@ -38,8 +38,8 @@ namespace ChatApp.API.MIP.Controllers
             GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.RegisterGroup(HttpContext.GetUser(), Name, Password, MaxUsers, Visibility, GroupType));
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            response.Include(_appService.RegisterGroup(HttpContext.GetUser(), Name, Password, MaxUsers, Visibility, GroupType));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
 
@@ -49,8 +49,8 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult InviteGroup(int inviteId)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.InviteToGroup(HttpContext.GetUser(), inviteId));
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            response.Include(_appService.InviteToGroup(HttpContext.GetUser(), inviteId));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpPost]
@@ -59,8 +59,8 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult JoinGroup(int GroupId, int UserId, string Message)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.JoinGroup(HttpContext.GetUser(), GroupId, UserId, Message));
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            response.Include(_appService.JoinGroup(HttpContext.GetUser(), GroupId, UserId, Message));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpPost]
@@ -69,8 +69,8 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult RemoveGroup(int GroupId)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.RemoveGroup(GroupId));
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            response.Include(_appService.RemoveGroup(GroupId));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpPost]
@@ -79,8 +79,8 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult RemoveUserFromGroup(int userId, int GroupId)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.RemoveUserFromGroup(userId, GroupId));
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            response.Include(_appService.RemoveUserFromGroup(userId, GroupId));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
     }
 

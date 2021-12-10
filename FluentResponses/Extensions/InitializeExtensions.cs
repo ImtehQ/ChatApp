@@ -6,10 +6,6 @@ namespace FluentResponses.Extensions.Initializers
 {
     public static class InitializeExtensions
     {
-        public static Response CreateResponse(this object Caller, IResponse Parent, [CallerMemberName] string MethodName = "")
-        {
-            return new Response(Parent, Caller, MethodName);
-        }
         public static Response CreateResponse(this object Caller, [CallerMemberName] string MethodName = "")
         {
             return new Response(Caller, MethodName);
@@ -18,6 +14,13 @@ namespace FluentResponses.Extensions.Initializers
         public static Response CreateResponse(Type Caller, [CallerMemberName] string MethodName = "")
         {
             return new Response(Caller, MethodName);
+        }
+
+        public static Response Include(this IResponse parentResponse, IResponse childResponse)
+        {
+            Response r = (Response)parentResponse;
+            r.Copy((Response)childResponse);
+            return r;
         }
     }
 }

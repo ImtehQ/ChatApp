@@ -64,8 +64,8 @@ namespace ChatApp.XUnitTests
             userRepository.CallBase = true;
             userRepository.Setup(x => x.GetUserByID(id)).Returns(new User() { UserName = "testUser" });
 
-            response.Includes(userService.GetUserById(id));
-            User testUser = response.LastIncluded().Contents<User>();
+            response.Include(userService.GetUserById(id));
+            User testUser = response.GetAttachment<User>();
 
             Assert.Equal("testUser", testUser.UserName);
         }

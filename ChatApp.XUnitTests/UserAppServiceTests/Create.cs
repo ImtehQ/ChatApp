@@ -5,6 +5,7 @@ using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using System.Collections.Generic;
 using Xunit;
+using FluentResponses.Extensions.MarkExtentions;
 
 namespace UserAppServiceTests
 {
@@ -19,7 +20,7 @@ namespace UserAppServiceTests
 
         [Fact]
         public void Username_Length_is_ToShort()
-        {
+        { 
             IResponse result = userService.Register("firstname", "a", "E@mail.com", "password");
             Assert.Equal("username to short", result.ReportMessage());
         }
@@ -87,7 +88,7 @@ namespace UserAppServiceTests
 
             IResponse result = userService.Register("Name", "usernameBob", "Test@Test.com", "123456789");
 
-            Assert.Equal("password already exists", result.ReportMessage());
+            Assert.Equal("username already exists", result.ReportMessage());
         }
 
         [Fact]
@@ -98,9 +99,9 @@ namespace UserAppServiceTests
                 .Returns(new List<User>() { new User() { UserName = "TestUserName" } });
 
             IResponse response = this.CreateResponse()
-                .Includes(appService.RegisterUser("Name", "Test2UserName", "goodTest@Test2.com", "123456789"));
+                .Include(appService.RegisterUser("Name", "Test2UserName", "goodTest@Test2.com", "123456789"));
 
-            Assert.True(response.LastIncluded().Status());
+            Assert.True(response.GetValid());
         }
     }
 }

@@ -2,6 +2,7 @@
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.MarkExtentions;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 

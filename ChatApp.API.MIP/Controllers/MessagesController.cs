@@ -26,8 +26,8 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult SendMessage(string Message, int Sender, int Type, int TypeId)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.SendMessage(Message, HttpContext.GetUser(), Type, TypeId));
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            response.Include(_appService.SendMessage(Message, HttpContext.GetUser(), Type, TypeId));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
 
         [HttpGet]
@@ -35,8 +35,8 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult PullMessages(int pageNr, GroupTypeEnum groupType, int groupId)
         {
             IResponse response = this.CreateResponse();
-            response.Includes(_appService.PullMessages(pageNr, groupId));
-            return StatusCode((int)response.Code(), response.ReportFullDetails());
+            response.Include(_appService.PullMessages(pageNr, groupId));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
     }
 }

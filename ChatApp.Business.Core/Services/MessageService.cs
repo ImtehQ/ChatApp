@@ -4,6 +4,7 @@ using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.MarkExtentions;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace ChatApp.Business.Core.Services
                 .Take(10)
                 .ToList();
 
-            response.Contents(messages);
+            response.SetAttachment(messages);
             return response.Successfull();
         }
 
@@ -43,7 +44,7 @@ namespace ChatApp.Business.Core.Services
                 .Skip(((pageNr - 1) * 10))
                 .Take(10).ToList();
 
-            response.Contents(messages);
+            response.SetAttachment(messages);
             return response.Successfull();
         }
 
@@ -51,8 +52,8 @@ namespace ChatApp.Business.Core.Services
         {
             IResponse response = this.CreateResponse();
 
-            response.Includes(MessageContentValidator.CheckContent(message));
-            if (response.LastIncluded().Status() == false)
+            response.Include(MessageContentValidator.CheckContent(message));
+            if (response.GetValid() == false)
                 return response.Failed();
 
             Message m = new Message() { Content = message, SenderId = sender, GroupId = groupId };

@@ -4,6 +4,8 @@ using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
+using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.MarkExtentions;
 
 namespace ChatApp.Business.Core.AppServices
 {
@@ -12,13 +14,13 @@ namespace ChatApp.Business.Core.AppServices
     {
         public IResponse ListGroupsFromUser(User user)
         {
-            return this.CreateResponse().Includes(_GroupUserService.GetGroupsByUser(user)).Successfull();
+            return this.CreateResponse().Include(_GroupUserService.GetGroupsByUser(user)).Successfull();
         }
 
         public IResponse ListGroups(int groupId, int userId)
         {
             IResponse response = this.CreateResponse();
-            User user = response.Includes(_UserService.GetUserById(userId)).LastIncluded().Contents<User>();
+            User user = response.Include(_UserService.GetUserById(userId)).GetAttachment<User>();
             _GroupUserService.GetGroupsByUser(user);
             return response.Successfull();
         }
@@ -29,13 +31,13 @@ namespace ChatApp.Business.Core.AppServices
         {
             IResponse response = this.CreateResponse();
 
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            if (response.GetValid() == false) return response.Failed();
 
-            Group group = response.Includes(_GroupService.Create(name, password, maxUsers, Visibility, GroupType)).LastIncluded().Contents<Group>();
+            Group group = response.Include(_GroupService.Create(name, password, maxUsers, Visibility, GroupType)).GetAttachment<Group>();
 
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            if (response.GetValid() == false) return response.Failed();
 
-            return response.Includes(_GroupUserService.Insert(
+            return response.Include(_GroupUserService.Insert(
                 user, group, AccountRoleEnum.RoleAdmin)).Successfull();
         }
 
@@ -44,15 +46,15 @@ namespace ChatApp.Business.Core.AppServices
         {
             IResponse response = this.CreateResponse();
 
-            Invite invite = response.Includes(_InviteService.GetInviteById(inviteId)).LastIncluded().Contents<Invite>();
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            Invite invite = response.Include(_InviteService.GetInviteById(inviteId)).GetAttachment<Invite>();
+            if (response.GetValid() == false) return response.Failed();
 
-            Group group = response.Includes(_GroupService.GetGroupById(invite.GroupId)).LastIncluded().Contents<Group>();
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            Group group = response.Include(_GroupService.GetGroupById(invite.GroupId)).GetAttachment<Group>();
+            if (response.GetValid() == false) return response.Failed();
 
-            response.Includes(_GroupUserService.Insert(
+            response.Include(_GroupUserService.Insert(
                 user, group, AccountRoleEnum.RoleUser));
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            if (response.GetValid() == false) return response.Failed();
 
             return response.Successfull();
         }
@@ -61,22 +63,22 @@ namespace ChatApp.Business.Core.AppServices
         {
             IResponse response = this.CreateResponse();
 
-            User user = response.Includes(_UserService.GetUserById(userId)).LastIncluded().Contents<User>();
+            User user = response.Include(_UserService.GetUserById(userId)).GetAttachment<User>();
 
-            Group group = response.Includes(_GroupService.Create("Invite chat", "", 2,
-                GroupVisibilityEnum.OptionPrivate, GroupTypeEnum.OptionPrivate)).LastIncluded().Contents<Group>();
+            Group group = response.Include(_GroupService.Create("Invite chat", "", 2,
+                GroupVisibilityEnum.OptionPrivate, GroupTypeEnum.OptionPrivate)).GetAttachment<Group>();
 
-            response.Includes(_GroupUserService.Join(group, sender, AccountRoleEnum.RoleAdmin));
+            response.Include(_GroupUserService.Join(group, sender, AccountRoleEnum.RoleAdmin));
 
-            response.Includes(_GroupUserService.Join(group, user, AccountRoleEnum.RoleUser));
+            response.Include(_GroupUserService.Join(group, user, AccountRoleEnum.RoleUser));
 
 
             Invite invite = new Invite() { GroupId = group.GroupId, Message = message };
 
-            response.Includes(_InviteService.Register(invite));
+            response.Include(_InviteService.Register(invite));
 
-            response.Includes(_MessageService.SendMessage(message, sender, GroupTypeEnum.OptionPrivate, group.GroupId));
-            response.Includes(_MessageService.SendMessage($"Invite: {invite.Id}", sender, GroupTypeEnum.OptionPrivate, group.GroupId));
+            response.Include(_MessageService.SendMessage(message, sender, GroupTypeEnum.OptionPrivate, group.GroupId));
+            response.Include(_MessageService.SendMessage($"Invite: {invite.Id}", sender, GroupTypeEnum.OptionPrivate, group.GroupId));
 
             return response.Successfull();
         }
@@ -85,14 +87,14 @@ namespace ChatApp.Business.Core.AppServices
         {
             IResponse response = this.CreateResponse();
 
-            Group group = response.Includes(_GroupService.GetGroupById(groupId)).LastIncluded().Contents<Group>();
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            Group group = response.Include(_GroupService.GetGroupById(groupId)).GetAttachment<Group>();
+            if (response.GetValid() == false) return response.Failed();
 
-            response.Includes(_GroupUserService.RemoveGroup(group));
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            response.Include(_GroupUserService.RemoveGroup(group));
+            if (response.GetValid() == false) return response.Failed();
 
-            response.Includes(_GroupService.RemoveGroup(groupId));
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            response.Include(_GroupService.RemoveGroup(groupId));
+            if (response.GetValid() == false) return response.Failed();
 
             return response.Successfull();
         }
@@ -101,17 +103,17 @@ namespace ChatApp.Business.Core.AppServices
         {
             IResponse response = this.CreateResponse();
 
-            Group group = response.Includes(_GroupService.GetGroupById(groupId)).LastIncluded().Contents<Group>();
-            if (response.LastIncluded().Status() == false) return response.Failed();
+            Group group = response.Include(_GroupService.GetGroupById(groupId)).GetAttachment<Group>();
+            if (response.GetValid() == false) return response.Failed();
 
-            AccountRoleEnum userAccountRole = response.Includes(_GroupUserService.GetAccountRoleByUser(user, group))
-                .LastIncluded().Contents<AccountRoleEnum>();
+            AccountRoleEnum userAccountRole = response.Include(_GroupUserService.GetAccountRoleByUser(user, group))
+                .GetAttachment<AccountRoleEnum>();
             if ((int)userAccountRole < (int)AccountRoleEnum.RoleModerator)
             {
                 return response.Failed(null, System.Net.HttpStatusCode.Unauthorized);
             }
 
-            response.Includes(_GroupUserService.RemoveUser(user, group));
+            response.Include(_GroupUserService.RemoveUser(user, group));
 
             return response.Successfull();
         }

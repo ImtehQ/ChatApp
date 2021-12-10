@@ -47,7 +47,7 @@ namespace ChatApp.API.MIP
                     if (string.IsNullOrEmpty(accountId) == false)
                     {
                         // attach account to context on successful jwt validation
-                        User user = userService.GetUserById(Convert.ToInt32(accountId)).Contents<User>();
+                        User user = userService.GetUserById(Convert.ToInt32(accountId)).GetAttachment<User>();
                         context.Items["User"] = user;
                     }
                 }
