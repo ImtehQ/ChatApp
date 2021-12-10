@@ -1,11 +1,9 @@
 ﻿using ChatApp.Domain.Enums;
-using ChatApp.Domain.Enums.ResponseCodes;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Business.Core.AppServices
 {
@@ -17,15 +15,15 @@ namespace ChatApp.Business.Core.AppServices
             return this.CreateResponse().Includes(_GroupUserService.GetGroupsByUser(user)).Successfull();
         }
 
-        public IResponse ListGroups(int GroupId, int UserId)
+        public IResponse ListGroups(int groupId, int userId)
         {
             IResponse response = this.CreateResponse();
-            User user = response.Includes(_UserService.GetUserById(UserId)).LastIncluded().Contents<User>();
+            User user = response.Includes(_UserService.GetUserById(userId)).LastIncluded().Contents<User>();
             _GroupUserService.GetGroupsByUser(user);
             return response.Successfull();
         }
 
-        public IResponse RegisterGroup(User user, string Name, string Password, int MaxUsers = 0,
+        public IResponse RegisterGroup(User user, string name, string password, int maxUsers = 0,
             GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic,
             GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
@@ -33,7 +31,7 @@ namespace ChatApp.Business.Core.AppServices
 
             if (response.LastIncluded().Status() == false) return response.Failed();
 
-            Group group = response.Includes(_GroupService.Create(Name, Password, MaxUsers, Visibility, GroupType)).LastIncluded().Contents<Group>();
+            Group group = response.Includes(_GroupService.Create(name, password, maxUsers, Visibility, GroupType)).LastIncluded().Contents<Group>();
 
             if (response.LastIncluded().Status() == false) return response.Failed();
 
@@ -59,11 +57,11 @@ namespace ChatApp.Business.Core.AppServices
             return response.Successfull();
         }
 
-        public IResponse JoinGroup(User sender, int GroupId, int UserId, string Message)
+        public IResponse JoinGroup(User sender, int groupId, int userId, string message)
         {
             IResponse response = this.CreateResponse();
 
-            User user = response.Includes(_UserService.GetUserById(UserId)).LastIncluded().Contents<User>();
+            User user = response.Includes(_UserService.GetUserById(userId)).LastIncluded().Contents<User>();
 
             Group group = response.Includes(_GroupService.Create("Invite chat", "", 2,
                 GroupVisibilityEnum.OptionPrivate, GroupTypeEnum.OptionPrivate)).LastIncluded().Contents<Group>();
@@ -73,27 +71,27 @@ namespace ChatApp.Business.Core.AppServices
             response.Includes(_GroupUserService.Join(group, user, AccountRoleEnum.RoleUser));
 
 
-            Invite invite = new Invite() { GroupId = group.GroupId, Message = Message };
+            Invite invite = new Invite() { GroupId = group.GroupId, Message = message };
 
             response.Includes(_InviteService.Register(invite));
 
-            response.Includes(_MessageService.SendMessage(Message, sender, GroupTypeEnum.OptionPrivate, group.GroupId));
+            response.Includes(_MessageService.SendMessage(message, sender, GroupTypeEnum.OptionPrivate, group.GroupId));
             response.Includes(_MessageService.SendMessage($"Invite: {invite.Id}", sender, GroupTypeEnum.OptionPrivate, group.GroupId));
 
             return response.Successfull();
         }
 
-        public IResponse RemoveGroup(int GroupId)
+        public IResponse RemoveGroup(int groupId)
         {
             IResponse response = this.CreateResponse();
 
-            Group group = response.Includes(_GroupService.GetGroupById(GroupId)).LastIncluded().Contents<Group>();
+            Group group = response.Includes(_GroupService.GetGroupById(groupId)).LastIncluded().Contents<Group>();
             if (response.LastIncluded().Status() == false) return response.Failed();
 
             response.Includes(_GroupUserService.RemoveGroup(group));
             if (response.LastIncluded().Status() == false) return response.Failed();
 
-            response.Includes(_GroupService.RemoveGroup(GroupId));
+            response.Includes(_GroupService.RemoveGroup(groupId));
             if (response.LastIncluded().Status() == false) return response.Failed();
 
             return response.Successfull();

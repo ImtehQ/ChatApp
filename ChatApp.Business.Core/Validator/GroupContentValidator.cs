@@ -1,6 +1,4 @@
-﻿using ChatApp.Domain.Enums.ResponseCodes;
-
-namespace ChatApp.Business.Core.Validator
+﻿namespace ChatApp.Business.Core.Validator
 {
     public static class GroupContentValidator
     {

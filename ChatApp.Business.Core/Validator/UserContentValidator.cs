@@ -1,11 +1,6 @@
-﻿using ChatApp.Domain.Enums.ResponseCodes;
-using FluentResponses;
-using FluentResponses.Interfaces;
-using System;
-using System.Globalization;
-using System.Text.RegularExpressions;
-using FluentResponses.Extensions.Initializers;
+﻿using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
+using FluentResponses.Interfaces;
 
 namespace ChatApp.Business.Core.Validator
 {

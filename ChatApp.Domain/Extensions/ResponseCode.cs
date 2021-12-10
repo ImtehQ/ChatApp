@@ -1,10 +1,5 @@
-﻿using ChatApp.Domain.Enums;
-using ChatApp.Domain.Enums.ResponseCodes;
-using System;
+﻿using ChatApp.Domain.Enums.ResponseCodes;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatApp.Business.Domain.Responses
 {
@@ -15,11 +10,11 @@ namespace ChatApp.Business.Domain.Responses
 
         public List<int> ToCodes()
         {
-            return new List<int>() { (int)LayerCode, (int)MethodCode};
+            return new List<int>() { (int)LayerCode, (int)MethodCode };
         }
 
         public static ResponseCode NewCode(
-            LayerCode layerCode, 
+            LayerCode layerCode,
             MethodCode methodCode)
         {
             return new ResponseCode()

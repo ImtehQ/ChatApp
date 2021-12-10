@@ -34,12 +34,12 @@ namespace ChatApp.Business.Core.Services
             return response.Successfull();
         }
 
-        public IResponse GetAllMessages(int groupId, int pageNr, string Query)
+        public IResponse GetAllMessages(int groupId, int pageNr, string query)
         {
             IResponse response = this.CreateResponse();
 
             List<Message> messages = _messageRepository.GetMessages()
-                .Where(m => m.GroupId == groupId && m.Content.Contains(Query))
+                .Where(m => m.GroupId == groupId && m.Content.Contains(query))
                 .Skip(((pageNr - 1) * 10))
                 .Take(10).ToList();
 

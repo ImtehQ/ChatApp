@@ -1,10 +1,6 @@
 ﻿using FluentResponses.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FluentResponses.TraceExtensions
 {
@@ -13,6 +9,22 @@ namespace FluentResponses.TraceExtensions
         public static string FullTrace(this IResponse response)
         {
             return "Nothing here yet!";
+        }
+
+        public static bool TraceValid(this IResponse response)
+        {
+            var responses = response.Includes();
+            if (responses.Count > 0)
+            {
+                if (response.Status() != null && response.Status() == false)
+                    return false;
+                foreach (var item in responses)
+                {
+                    if (TraceValid(item) == false)
+                        return false;
+                }
+            }
+            return true;
         }
 
         public static List<HttpStatusCode> TraceCodes(this IResponse response)
@@ -36,7 +48,7 @@ namespace FluentResponses.TraceExtensions
             var responses = response.Includes();
             if (responses.Count > 0)
             {
-                if(response.Contents().GetType() == typeof(T))
+                if (response.Contents().GetType() == typeof(T))
                     traceContents.Add((T)response.Contents());
                 foreach (var item in responses)
                 {

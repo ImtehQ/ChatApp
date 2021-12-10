@@ -1,12 +1,5 @@
-﻿using ChatApp.Business.Core.Cryptography;
-using ChatApp.Domain.Models;
+﻿using ChatApp.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using RandomNameGeneratorLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatApp.Business.Core.DbContexts
 {

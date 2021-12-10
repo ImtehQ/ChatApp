@@ -1,5 +1,4 @@
 ﻿using ChatApp.API.MIP.HttpContextExtensions;
-using ChatApp.Business.Core.AppServices;
 using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces.Services;
 using FluentResponses.Extensions.Initializers;

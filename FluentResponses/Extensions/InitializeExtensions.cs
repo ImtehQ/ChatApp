@@ -1,7 +1,5 @@
 ﻿using FluentResponses.Interfaces;
-using FluentResponses.Models;
 using System;
-using System.Net;
 using System.Runtime.CompilerServices;
 
 namespace FluentResponses.Extensions.Initializers

@@ -61,17 +61,22 @@ namespace ChatApp.Business.Core.Services
             IResponse response = this.CreateResponse();
 
             if (response.Includes(UserContentValidator.RegisterName(name)).LastIncluded().Status() == false)
-                return response.Failed(username, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "name invalid", HttpStatusCode.NotAcceptable);
 
             if (response.Includes(UserContentValidator.RegisterUsername(username)).LastIncluded().Status() == false)
-                return response.Failed(username, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "username invalid", HttpStatusCode.NotAcceptable);
 
             if (response.Includes(UserContentValidator.RegisterEmailAddress(emailaddress)).LastIncluded().Status() == false)
-                return response.Failed(username, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "emailaddress invalid", HttpStatusCode.NotAcceptable);
 
             if (response.Includes(UserContentValidator.RegisterPassword(password)).LastIncluded().Status() == false)
-                return response.Failed(username, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "password invalid", HttpStatusCode.NotAcceptable);
 
+            if (_userRepository.GetUsers().Where(x => x.Email == emailaddress).Count() > 0)
+                return response.Failed(message: "emailaddress already exists", HttpStatusCode.NotAcceptable);
+
+            if (_userRepository.GetUsers().Where(x => x.UserName == username).Count() > 0)
+                return response.Failed(message: "username already exists", HttpStatusCode.NotAcceptable);
 
             //===================================================================
 

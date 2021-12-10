@@ -1,11 +1,9 @@
-﻿using ChatApp.Domain.Enums.ResponseCodes;
-using ChatApp.Business.Core.Repositorys;
-using ChatApp.Domain.Models;
+﻿using ChatApp.Business.Core.Repositorys;
 using ChatApp.Domain.Interfaces.Services;
-using ChatApp.Domain.Interfaces;
-using FluentResponses.Interfaces;
+using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
+using FluentResponses.Interfaces;
 
 namespace ChatApp.Business.Core.Services
 {

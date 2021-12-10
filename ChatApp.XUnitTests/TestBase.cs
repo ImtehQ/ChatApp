@@ -2,38 +2,31 @@
 using ChatApp.Business.Core.Authentication;
 using ChatApp.Business.Core.Repositorys;
 using ChatApp.Business.Core.Services;
-using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Repositorys;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
-using FluentResponses.Extensions.Initializers;
-using FluentResponses.Interfaces;
 using Microsoft.Extensions.Options;
 using Moq;
-using Xunit;
 
 namespace ChatApp.XUnitTests
 {
-    public class UserControllerTests
+    public class TestBase
     {
-        User user;
-        GroupTypeEnum groupType;
+        public IGroupService GroupService;
+        public IUserService userService;
+        public IGroupUserService groupUserService;
+        public IMessageService messageService;
+        public IInviteService inviteService;
+        public IAppService appService;
 
-        IGroupService GroupService;
-        IUserService userService;
-        IGroupUserService groupUserService;
-        IMessageService messageService;
-        IInviteService inviteService;
-        IAppService appService;
+        public Mock<IGroupRepository> groupRepository;
+        public Mock<IUserRepository> userRepository;
+        public Mock<IGroupUserRepository> userGroupRepository;
+        public Mock<IMessageRepository> messageRepository;
+        public Mock<IInviteRepository> inviteRepository;
 
-        Mock<IGroupRepository> groupRepository;
-        Mock<IUserRepository> userRepository;
-        Mock<IGroupUserRepository> userGroupRepository;
-        Mock<IMessageRepository> messageRepository;
-        Mock<IInviteRepository> inviteRepository;
-
-        private void GetMocks()
+        public TestBase()
         {
             groupRepository = new Mock<IGroupRepository>();
             userRepository = new Mock<IUserRepository>();
@@ -52,22 +45,6 @@ namespace ChatApp.XUnitTests
             inviteService = new InviteService(inviteRepository.Object);
 
             appService = new AppService(GroupService, userService, groupUserService, messageService, inviteService);
-        }
-
-        [Theory]
-        [InlineData(0)]
-        public void GetUserById(int id)
-        {
-            GetMocks();
-
-            IResponse response = this.CreateResponse();
-            userRepository.CallBase = true;
-            userRepository.Setup(x => x.GetUserByID(id)).Returns(new User() { UserName = "testUser" });
-
-            response.Includes(userService.GetUserById(id));
-            User testUser = response.LastIncluded().Contents<User>();
-
-            Assert.Equal("testUser", testUser.UserName);
         }
     }
 }

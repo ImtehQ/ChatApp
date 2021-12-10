@@ -60,6 +60,15 @@ namespace FluentResponses
             }
             return _Contents.Content;
         }
+        public IResponse ContentMessage(string message)
+        {
+            _Contents.Message = message;
+            return this;
+        }
+        public string ContentMessage()
+        {
+            return _Contents.Message;
+        }
         public T Contents<T>()
         {
             if (_Contents == null)
@@ -98,11 +107,11 @@ namespace FluentResponses
             _Status = new Status(value);
             return this;
         }
-        public bool Status()
+        public bool? Status()
         {
             if (_Status == null)
             {
-                _Status = new Status(false);
+                return null;
             }
             return _Status.Value;
         }
@@ -113,7 +122,7 @@ namespace FluentResponses
         {
             Type Source = Caller.GetType();
             Invoker = Source.GetMethod(MethodName);
-            if(Invoker != null)
+            if (Invoker != null)
                 Parameters = Invoker.GetParameters();
         }
 

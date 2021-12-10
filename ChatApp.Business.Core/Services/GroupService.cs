@@ -1,13 +1,10 @@
 ﻿using ChatApp.Domain.Enums;
-using ChatApp.Domain.Enums.ResponseCodes;
 using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
-using FluentResponses;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
-using System.Linq;
 
 namespace ChatApp.Business.Core.Services
 {
@@ -21,7 +18,7 @@ namespace ChatApp.Business.Core.Services
             _GroupRepository = groupRepository;
         }
 
-        public IResponse Create(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
+        public IResponse Create(string name, string password, int maxUsers = 0, GroupVisibilityEnum visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum groupType = GroupTypeEnum.OptionGroup)
         {
             throw new System.NotImplementedException();
         }
@@ -34,16 +31,16 @@ namespace ChatApp.Business.Core.Services
             return response.Successfull();
         }
 
-        public IResponse Register(string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
+        public IResponse Register(string name, string password, int maxUsers = 0, GroupVisibilityEnum visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum groupType = GroupTypeEnum.OptionGroup)
         {
             IResponse response = this.CreateResponse();
             Group group = new Group()
             {
-                Name = Name,
-                MaxUsers = MaxUsers,
-                VisibilityType = Visibility,
-                Password = Password,
-                type = GroupType
+                Name = name,
+                MaxUsers = maxUsers,
+                VisibilityType = visibility,
+                Password = password,
+                type = groupType
             };
             response.Contents(group);
             _GroupRepository.InsertGroup(group);

@@ -1,15 +1,12 @@
-﻿using ChatApp.Domain.Enums;
+﻿using ChatApp.API.MIP.HttpContextExtensions;
+using ChatApp.Domain.Enums;
+using ChatApp.Domain.Interfaces.Services;
+using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.Reports;
+using FluentResponses.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AuthorizeAttribute = ChatApp.Business.Core.Authentication.AuthorizeAttribute;
-using ChatApp.Domain.Interfaces.Services;
-using ChatApp.Business.Core.Extensions;
-using FluentResponses.Interfaces;
-using FluentResponses.Extensions.Initializers;
-using FluentResponses.Extensions.Reports;
-using ChatApp.Domain.Models;
-using FluentResponses.TraceExtensions;
-using ChatApp.API.MIP.HttpContextExtensions;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -30,7 +27,11 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult ListUsers(GroupTypeEnum groupType)
         {
             IResponse response = this.CreateResponse();
+
+
             response.Includes(_appService.ListUsers(HttpContext.GetUser(), groupType));
+
+
             response.Successfull();
             return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
@@ -55,7 +56,7 @@ namespace ChatApp.API.MIP.Controllers
             response.Includes(
                 _appService.RegisterUser(Name, Username, Emailaddress, Password));
             response.Successfull();
-            return StatusCode((int)response.Code(), response.TraceCodes());
+            return StatusCode((int)response.Code(), response.ReportFullDetails());
         }
 
         [HttpPut]

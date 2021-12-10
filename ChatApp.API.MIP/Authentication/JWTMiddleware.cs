@@ -22,7 +22,7 @@ namespace ChatApp.API.MIP
 
         public async Task Invoke(HttpContext context, IConfiguration configuration, IUserService userService)
         {
-            
+
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
 
             if (token != null)

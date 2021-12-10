@@ -1,7 +1,6 @@
 ﻿using ChatApp.Domain.Enums;
 using ChatApp.Domain.Models;
 using FluentResponses.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace ChatApp.Domain.Interfaces.Services
 {

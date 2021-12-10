@@ -1,17 +1,4 @@
 ﻿using ChatApp.Domain.Interfaces.Services;
-using ChatApp.Domain.Enums;
-using ChatApp.Domain.Enums.ResponseCodes;
-using ChatApp.Domain.Interfaces.Services;
-using ChatApp.Domain.Models;
-using FluentResponses.Extensions.Initializers;
-using FluentResponses.Extensions.Reports;
-using FluentResponses.Interfaces;
-using Microsoft.AspNetCore.Mvc;
-using ChatApp.Domain.Models;
-using FluentResponses.Extensions.Initializers;
-using FluentResponses.Extensions.Reports;
-using FluentResponses.Interfaces;
-using Microsoft.AspNetCore.Http;
 
 namespace ChatApp.Business.Core.AppServices
 {
@@ -26,13 +13,13 @@ namespace ChatApp.Business.Core.AppServices
 
 
         public AppService(
-            IGroupService GroupService,
+            IGroupService groupService,
             IUserService userService,
             IGroupUserService groupUserService,
             IMessageService messageService,
             IInviteService inviteService)
         {
-            _GroupService = GroupService;
+            _GroupService = groupService;
             _UserService = userService;
             _GroupUserService = groupUserService;
             _MessageService = messageService;

@@ -1,17 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace FluentResponses.Models
+﻿namespace FluentResponses.Models
 {
     public class Contents
     {
+        internal string Message { get; set; }
         internal object Content { get; init; }
-        internal Contents(object content)
+        internal Contents(object content, string message = "")
         {
             Content = content;
+            Message = message;
         }
     }
 }

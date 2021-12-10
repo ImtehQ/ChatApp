@@ -1,15 +1,12 @@
 ﻿using ChatApp.Domain.Enums;
 using ChatApp.Domain.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System;
-using System.Web.Mvc;
-using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using IAuthorizationFilter = Microsoft.AspNetCore.Mvc.Filters.IAuthorizationFilter;
 using JsonResult = Microsoft.AspNetCore.Mvc.JsonResult;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Mvc.Authorization;
 
 namespace ChatApp.Business.Core.Authentication
 {

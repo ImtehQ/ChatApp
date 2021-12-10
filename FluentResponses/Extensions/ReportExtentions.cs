@@ -1,7 +1,5 @@
 ﻿using FluentResponses.Interfaces;
-using FluentResponses.Models;
-using System.Collections.Generic;
-using System.Linq;
+using FluentResponses.TraceExtensions;
 using System.Net;
 
 namespace FluentResponses.Extensions.Reports
@@ -12,7 +10,7 @@ namespace FluentResponses.Extensions.Reports
         {
             if (CheckIfValid)
             {
-                if(response.Status() == true)
+                if (response.Status() == true)
                 {
                     return response.GenerateFullDetailedReport();
                 }
@@ -22,6 +20,11 @@ namespace FluentResponses.Extensions.Reports
                 return response.GenerateFullDetailedReport();
             }
             return null;
+        }
+
+        public static string ReportMessage(this IResponse response)
+        {
+            return response.ContentMessage();
         }
 
         private static string GenerateFullDetailedReport(this IResponse response)
@@ -64,10 +67,10 @@ namespace FluentResponses.Extensions.Reports
             HttpStatusCode httpStatusSuccessfull = HttpStatusCode.OK,
             HttpStatusCode httpStatusFailed = HttpStatusCode.BadRequest)
         {
-            return response.ReturnCheck(response.Status(), httpStatusSuccessfull, httpStatusFailed);
+            return response.ReturnCheckStatus(response.Status().Value, httpStatusSuccessfull, httpStatusFailed);
         }
 
-        public static IResponse ReturnCheck(this IResponse response, bool check,
+        public static IResponse ReturnCheckStatus(this IResponse response, bool check,
            HttpStatusCode httpStatusSuccessfull = HttpStatusCode.OK,
            HttpStatusCode httpStatusFailed = HttpStatusCode.BadRequest)
         {
@@ -77,6 +80,24 @@ namespace FluentResponses.Extensions.Reports
                 return response.Failed(httpStatusFailed);
         }
 
+        public static IResponse ReturnCheckStatusLast(this IResponse response,
+           HttpStatusCode httpStatusSuccessfull = HttpStatusCode.OK,
+           HttpStatusCode httpStatusFailed = HttpStatusCode.BadRequest)
+        {
+            return response.ReturnCheckStatus(response.LastIncluded().Status().Value,
+                httpStatusSuccessfull,
+                httpStatusFailed);
+        }
+
+        public static IResponse ReturnCheckStatusAll(this IResponse response,
+   HttpStatusCode httpStatusSuccessfull = HttpStatusCode.OK,
+   HttpStatusCode httpStatusFailed = HttpStatusCode.BadRequest)
+        {
+            return response.ReturnCheckStatus(response.TraceValid(),
+                httpStatusSuccessfull,
+                httpStatusFailed);
+        }
+
         public static IResponse Successfull(this IResponse response, HttpStatusCode httpStatus = HttpStatusCode.OK)
         {
             return response.Status(true).Code(httpStatus);
@@ -84,13 +105,18 @@ namespace FluentResponses.Extensions.Reports
 
         public static IResponse Failed(this IResponse response)
         {
-            if(response.LastIncluded() != null)
+            if (response.LastIncluded() != null)
                 return response.Status(false).Code(response.LastIncluded().Code());
             return response.Status(false);
         }
         public static IResponse Failed(this IResponse response, object failedContent, HttpStatusCode httpStatus = HttpStatusCode.BadRequest)
         {
             return response.Status(false).Contents(failedContent).Code(httpStatus);
+        }
+
+        public static IResponse Failed(this IResponse response, string message, HttpStatusCode httpStatus = HttpStatusCode.BadRequest)
+        {
+            return response.Status(false).ContentMessage(message).Code(httpStatus);
         }
     }
 }

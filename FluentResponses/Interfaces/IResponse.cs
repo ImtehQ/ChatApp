@@ -13,6 +13,7 @@ namespace FluentResponses.Interfaces
 
         HttpStatusCode Code();
         Response Code(HttpStatusCode statusCode);
+        string ContentMessage();
         object Contents();
         Response Contents(object content);
         T Contents<T>(object content);
@@ -22,7 +23,7 @@ namespace FluentResponses.Interfaces
         IResponse LastIncluded();
         string Report();
         Response Report(string content);
-        bool Status();
+        bool? Status();
         Response Status(bool value);
     }
 }

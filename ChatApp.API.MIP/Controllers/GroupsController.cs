@@ -1,15 +1,11 @@
-﻿using ChatApp.Domain.Enums;
-using Microsoft.AspNetCore.Mvc;
-using AuthorizeAttribute = ChatApp.Business.Core.Authentication.AuthorizeAttribute;
-using ChatApp.Domain.Models;
+﻿using ChatApp.API.MIP.HttpContextExtensions;
+using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces.Services;
-using System.Collections.Generic;
-using ChatApp.Business.Core.Extensions;
-using FluentResponses.Interfaces;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
-using FluentResponses.TraceExtensions;
-using ChatApp.API.MIP.HttpContextExtensions;
+using FluentResponses.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using AuthorizeAttribute = ChatApp.Business.Core.Authentication.AuthorizeAttribute;
 
 namespace ChatApp.API.MIP.Controllers
 {

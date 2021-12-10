@@ -3,11 +3,8 @@ using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces.Repositorys;
 using ChatApp.Domain.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChatApp.Business.Core.Repositorys
 {
