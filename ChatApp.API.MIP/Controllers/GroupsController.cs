@@ -1,6 +1,7 @@
 ﻿using ChatApp.API.MIP.HttpContextExtensions;
 using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces.Services;
+using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
@@ -44,7 +45,7 @@ namespace ChatApp.API.MIP.Controllers
 
 
         [HttpPost]
-        [Route("groups/join")]
+        [Route("groups/joinGroup")]
         [Authorize(AccountRoleEnum.RoleUser)]
         public IActionResult InviteGroup(int inviteId)
         {
@@ -64,7 +65,7 @@ namespace ChatApp.API.MIP.Controllers
         }
 
         [HttpPost]
-        [Route("groups/remove")]
+        [Route("groups/removeGroup")]
         [Authorize(AccountRoleEnum.RoleUser)]
         public IActionResult RemoveGroup(int GroupId)
         {
@@ -76,10 +77,10 @@ namespace ChatApp.API.MIP.Controllers
         [HttpPost]
         [Route("groups/remove")]
         [Authorize(AccountRoleEnum.RoleUser)]
-        public IActionResult RemoveUserFromGroup(int userId, int GroupId)
+        public IActionResult RemoveUserFromGroup(User user, int GroupId)
         {
             IResponse response = this.CreateResponse();
-            response.Include(_appService.RemoveUserFromGroup(userId, GroupId));
+            response.Include(_appService.RemoveUserFromGroup(user, GroupId));
             return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
     }

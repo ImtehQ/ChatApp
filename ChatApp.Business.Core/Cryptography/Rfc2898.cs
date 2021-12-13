@@ -9,7 +9,7 @@ namespace ChatApp.Business.Core.Cryptography
         {
             byte[] saltArray = Encoding.ASCII.GetBytes(salt);
             Rfc2898DeriveBytes rfcKey = new Rfc2898DeriveBytes(password, saltArray);
-            return System.Text.Encoding.Default.GetString(rfcKey.GetBytes(32));
+            return System.Convert.ToBase64String(rfcKey.GetBytes(32));
         }
     }
 }

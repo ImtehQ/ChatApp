@@ -1,7 +1,5 @@
 ﻿using FluentResponses.Interfaces;
-using FluentResponses.Models;
 using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Reflection;
 
@@ -57,22 +55,27 @@ namespace FluentResponses
         {
             return (T)Attachment;
         }
-        public Response SetAttachment<T>(T value)
+
+        public Response SetAttachment(object value, bool autoValidate = true)
         {
             Attachment = value;
+            if (autoValidate)
+                ValidateAttachment();
             return this;
         }
 
-        public Response SetAttachment(object value)
+        public T SetAttachmentReturn<T>(T value, bool autoValidate = true)
         {
-            Attachment = value;
-            return this;
-        }
-
-        public T SetAttachmentReturn<T>(T value)
-        {
-            SetAttachment<T>(value);
+            SetAttachment(value, autoValidate);
             return value;
+        }
+
+        private void ValidateAttachment()
+        {
+            if (Attachment == null)
+                Valid = false;
+            else
+                Valid = true;
         }
     }
 }

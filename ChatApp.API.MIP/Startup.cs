@@ -1,11 +1,9 @@
-using ChapApp.Business.Core.Repositorys;
 using ChatApp.Business.Core.AppServices;
 using ChatApp.Business.Core.Authentication;
 using ChatApp.Business.Core.DbContexts;
 using ChatApp.Business.Core.Repositorys;
 using ChatApp.Business.Core.Services;
 using ChatApp.Domain.Interfaces;
-using ChatApp.Domain.Interfaces.Repositorys;
 using ChatApp.Domain.Interfaces.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -59,22 +57,29 @@ namespace ChatApp.API.MIP
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "ChatApp.API.MIP", Version = "v1" });
             });
 
-            services.AddDbContext<ChatAppContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            services.AddDbContext<UsersContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<GroupsContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<GroupUsersContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<MessagesContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<InvitesContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddTransient<IUserService, UserService>();
-            services.AddScoped<IAppService, AppService>();
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IInviteService, InviteService>();
             services.AddScoped<IGroupUserService, GroupUserService>();
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IAppService, AppService>();
 
-            services.AddScoped<IGroupUserRepository, EFGroupUserRepository>();
-            services.AddScoped<IUserRepository, EFUserRepository>();
-            services.AddScoped<IGroupRepository, EFGroupRepository>();
-            services.AddScoped<IMessageRepository, EFMessageRepository>();
-            services.AddScoped<IInviteRepository, EFInviteRepository>();
 
             services.AddScoped<IJWTAuthService, JWTAuthService>();
 

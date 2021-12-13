@@ -5,7 +5,6 @@ using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using System.Collections.Generic;
 using Xunit;
-using FluentResponses.Extensions.MarkExtentions;
 
 namespace UserAppServiceTests
 {
@@ -20,7 +19,7 @@ namespace UserAppServiceTests
 
         [Fact]
         public void Username_Length_is_ToShort()
-        { 
+        {
             IResponse result = userService.Register("firstname", "a", "E@mail.com", "password");
             Assert.Equal("username to short", result.ReportMessage());
         }
@@ -70,8 +69,8 @@ namespace UserAppServiceTests
         [Fact]
         public void Email_Already_Exists()
         {
-            userRepository.CallBase = true;
-            userRepository.Setup(x => x.GetUsers())
+            genericRepositoryUser.CallBase = true;
+            genericRepositoryUser.Setup(x => x.GetAll())
                 .Returns(new List<User>() { new User() { Email = "Test@Test.com" } });
 
             IResponse result = userService.Register("Name", "Username", "Test@Test.com", "123456789");
@@ -82,8 +81,8 @@ namespace UserAppServiceTests
         [Fact]
         public void Should_Return_Last_Invalid_When_Username_Already_Exists()
         {
-            userRepository.CallBase = true;
-            userRepository.Setup(x => x.GetUsers())
+            genericRepositoryUser.CallBase = true;
+            genericRepositoryUser.Setup(x => x.GetAll())
                 .Returns(new List<User>() { new User() { UserName = "usernameBob" } });
 
             IResponse result = userService.Register("Name", "usernameBob", "Test@Test.com", "123456789");
@@ -94,8 +93,8 @@ namespace UserAppServiceTests
         [Fact]
         public void Should_Return_Valid_When_User_Is_Registered()
         {
-            userRepository.CallBase = true;
-            userRepository.Setup(x => x.GetUsers())
+            genericRepositoryUser.CallBase = true;
+            genericRepositoryUser.Setup(x => x.GetAll())
                 .Returns(new List<User>() { new User() { UserName = "TestUserName" } });
 
             IResponse response = this.CreateResponse()

@@ -6,7 +6,6 @@ using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.MarkExtentions;
-using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using Microsoft.Extensions.Options;
 using System.Linq;
@@ -16,11 +15,11 @@ namespace ChatApp.Business.Core.Services
 {
     public class UserService : IUserService
     {
-        IUserRepository _userRepository;
+        IGenericRepository<User> _userRepository;
         IJWTAuthService _JWTAuthService;
         JWTToken _JWTToken;
 
-        public UserService(IUserRepository userRepository, IOptions<JWTToken> jwt, IJWTAuthService JWTAuthService)
+        public UserService(IGenericRepository<User> userRepository, IOptions<JWTToken> jwt, IJWTAuthService JWTAuthService)
         {
             _userRepository = userRepository;
             _JWTAuthService = JWTAuthService;
@@ -29,25 +28,30 @@ namespace ChatApp.Business.Core.Services
 
         public IResponse GetUserById(int Id)
         {
-            IResponse response = this.CreateResponse()
-                .SetAttachment<User>(_userRepository.GetUserByID(Id));
+            IResponse response = this.CreateResponse();
+            if (Id <= 0)
+                return response.Failed("Invalid user Id");
 
-            return response;
+            response.SetAttachment(_userRepository.GetById(Id));
+            if (response.GetValid() == false)
+                return response.Failed("User not found!");
+            return response.Successfull();
         }
 
         public IResponse Login(string username, string password)
         {
             IResponse response = this.CreateResponse();
 
-            User user = response.SetAttachmentReturn<User>(_userRepository.GetUsers().First(u => u.UserName == username));
+            User user = response.SetAttachmentReturn<User>(_userRepository.GetAll().FirstOrDefault(u => u.UserName == username));
 
             if (user == null)
-                return response.Failed(username, HttpStatusCode.NotFound);
+                return response.Failed("user not found", HttpStatusCode.NotFound);
 
             if (user.isBlocked == true)
                 return response.Failed(username, HttpStatusCode.Unauthorized);
+            string pwsHash = Rfc2898.Convert(password, username);
 
-            if (user.PasswordHash != Rfc2898.Convert(password, username))
+            if (user.PasswordHash != pwsHash)
                 return response.Failed(username, HttpStatusCode.Unauthorized);
 
             response.SetAttachment(_JWTAuthService.GetToken(user, _JWTToken));
@@ -55,7 +59,7 @@ namespace ChatApp.Business.Core.Services
             return response.Successfull();
         }
 
-        public IResponse Register (string name, string username, string emailaddress, string password)
+        public IResponse Register(string name, string username, string emailaddress, string password)
         {
             IResponse response = this.CreateResponse();
 
@@ -71,21 +75,23 @@ namespace ChatApp.Business.Core.Services
             if (response.Include(UserContentValidator.RegisterPassword(password)).GetValid() == false)
                 return response.Failed(message: "password to short", HttpStatusCode.NotAcceptable);
 
-            if (_userRepository.GetUsers().Where(x => x.Email == emailaddress).Count() > 0)
+            if (_userRepository.GetAll().Where(x => x.Email == emailaddress).Count() > 0)
                 return response.Failed(message: "emailaddress already exists", HttpStatusCode.NotAcceptable);
 
-            if (_userRepository.GetUsers().Where(x => x.UserName == username).Count() > 0)
+            if (_userRepository.GetAll().Where(x => x.UserName == username).Count() > 0)
                 return response.Failed(message: "username already exists", HttpStatusCode.NotAcceptable);
 
             //===================================================================
 
-            _userRepository.InsertUser(response.SetAttachmentReturn<User>(new User()
-            {
-                FirstName = name,
-                UserName = username,
-                Email = emailaddress,
-                PasswordHash = Rfc2898.Convert(password, username)
-            }));
+            _userRepository.Insert(
+                response.SetAttachmentReturn<User>(new User()
+                {
+                    FirstName = name,
+                    UserName = username,
+                    Email = emailaddress,
+                    PasswordHash = Rfc2898.Convert(password, username)
+                }
+            ));
 
             _userRepository.Save();
 
@@ -94,7 +100,7 @@ namespace ChatApp.Business.Core.Services
 
         private bool Exist(string username, string password)
         {
-            return _userRepository.GetUsers().Any(user =>
+            return _userRepository.GetAll().Any(user =>
             user.UserName == username &&
             user.PasswordHash == password) ? true : false;
         }
@@ -102,14 +108,16 @@ namespace ChatApp.Business.Core.Services
         public IResponse BlockUserById(int userId)
         {
             IResponse response = this.CreateResponse();
+            if (userId <= 0)
+                return response.Failed("Invalid user Id");
 
-            User user = response.SetAttachmentReturn<User>(_userRepository.GetUserByID(userId));
+            User user = response.SetAttachmentReturn<User>(_userRepository.GetById(userId));
 
-            if (user != null)
-            {
-                user.isBlocked = true;
-                _userRepository.UpdateUser(user);
-            }
+            if (user == null)
+                return response.Failed("User not found!");
+
+            user.isBlocked = true;
+            _userRepository.Update(user);
 
             return response.Successfull();
         }
@@ -117,25 +125,28 @@ namespace ChatApp.Business.Core.Services
         public IResponse AccountUpdate(int userId, string username, string emailaddress, string password)
         {
             IResponse response = this.CreateResponse();
+            if (userId <= 0)
+                return response.Failed("Invalid user Id");
 
             User user = response.Include(GetUserById(userId)).GetAttachment<User>();
             if (response.GetValid() == false)
-                return response.Failed();
+                return response;
 
             if (response.Include(UserContentValidator.RegisterUsername(username)).GetValid() == false)
-                return response.Failed(username, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "username to short", HttpStatusCode.NotAcceptable);
 
             if (response.Include(UserContentValidator.RegisterEmailAddress(emailaddress)).GetValid() == false)
-                return response.Failed(username, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "emailaddress to short", HttpStatusCode.NotAcceptable);
 
             if (response.Include(UserContentValidator.RegisterPassword(password)).GetValid() == false)
-                return response.Failed(username, HttpStatusCode.NotAcceptable);
+                return response.Failed(message: "password to short", HttpStatusCode.NotAcceptable);
+
 
             user.UserName = username;
             user.Email = emailaddress;
             user.PasswordHash = Rfc2898.Convert(password, emailaddress);
 
-            _userRepository.UpdateUser(user);
+            _userRepository.Update(user);
 
             return response.Successfull();
         }

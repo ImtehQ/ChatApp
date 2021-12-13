@@ -1,16 +1,11 @@
 ﻿using FluentResponses.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FluentResponses.Extensions.MarkExtentions
 {
     public static class MarkExtentions
     {
-        
+
         public static IResponse Successfull(this IResponse response)
         {
             return response.Successfull(HttpStatusCode.OK);
@@ -44,7 +39,7 @@ namespace FluentResponses.Extensions.MarkExtentions
             return response;
         }
 
-        public static IResponse Failed(this IResponse response, string message ,HttpStatusCode httpStatusCode)
+        public static IResponse Failed(this IResponse response, string message, HttpStatusCode httpStatusCode)
         {
             Response r = (Response)response;
             r.Message = message;

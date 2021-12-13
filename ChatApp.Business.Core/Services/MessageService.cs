@@ -5,7 +5,6 @@ using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.MarkExtentions;
-using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +13,9 @@ namespace ChatApp.Business.Core.Services
 {
     public class MessageService : IMessageService
     {
-        IMessageRepository _messageRepository;
+        IGenericRepository<Message> _messageRepository;
 
-        public MessageService(IMessageRepository messageRepository)
+        public MessageService(IGenericRepository<Message> messageRepository)
         {
             _messageRepository = messageRepository;
         }
@@ -25,7 +24,7 @@ namespace ChatApp.Business.Core.Services
         {
             IResponse response = this.CreateResponse();
 
-            List<Message> messages = _messageRepository.GetMessages()
+            List<Message> messages = _messageRepository.GetAll()
                 .Where(m => m.GroupId == groupId)
                 .Skip(((pageNr - 1) * 10))
                 .Take(10)
@@ -39,7 +38,7 @@ namespace ChatApp.Business.Core.Services
         {
             IResponse response = this.CreateResponse();
 
-            List<Message> messages = _messageRepository.GetMessages()
+            List<Message> messages = _messageRepository.GetAll()
                 .Where(m => m.GroupId == groupId && m.Content.Contains(query))
                 .Skip(((pageNr - 1) * 10))
                 .Take(10).ToList();
@@ -57,7 +56,7 @@ namespace ChatApp.Business.Core.Services
                 return response.Failed();
 
             Message m = new Message() { Content = message, SenderId = sender, GroupId = groupId };
-            _messageRepository.InsertMessage(m);
+            _messageRepository.Insert(m);
             _messageRepository.Save();
 
 

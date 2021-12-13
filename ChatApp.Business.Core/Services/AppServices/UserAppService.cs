@@ -3,7 +3,6 @@ using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.MarkExtentions;
-using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using System.Net;
 
@@ -16,20 +15,27 @@ namespace ChatApp.Business.Core.AppServices
         {
             return this.CreateResponse().Include(_UserService.GetUserById(userId));
         }
-        public IResponse ListUsers(User user, GroupTypeEnum groupType)
+        public IResponse ListUsers(User user, int groupType)
         {
-            return this.CreateResponse()
-                .Include(_GroupUserService.GetAllUsersByGroupType(user, groupType));
+            IResponse response = this.CreateResponse();
+            if (user == null)
+                return response.Failed("Anomimomus not allowed");
+
+            if (GroupTypeEnum.IsDefined(typeof(GroupTypeEnum), groupType) == false)
+                return response.Failed("Invalid GroupTypeEnum value");
+
+            return response.Include(_GroupUserService.GetAllUsersByGroupType(user, (GroupTypeEnum)groupType));
         }
 
         public IResponse LoginUser(string username, string password)
         {
             IResponse response = this.CreateResponse();
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-            {
-                return response.Failed(System.Net.HttpStatusCode.BadRequest);
-            }
+            if (string.IsNullOrEmpty(username))
+                return response.Failed(message: "Username is empty", HttpStatusCode.NotAcceptable);
+
+            if (string.IsNullOrEmpty(password))
+                return response.Failed(message: "Password is empty", HttpStatusCode.NotAcceptable);
 
             return response.Include(_UserService.Login(username, password));
         }
@@ -72,16 +78,6 @@ namespace ChatApp.Business.Core.AppServices
         }
 
         public IResponse ListGroups(int groupId, User user)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public IResponse RegisterGroup(int userId, string name, string password, int maxUsers = 0, GroupVisibilityEnum visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum groupType = GroupTypeEnum.OptionGroup)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public IResponse RemoveUserFromGroup(int userId, int GroupId)
         {
             throw new System.NotImplementedException();
         }

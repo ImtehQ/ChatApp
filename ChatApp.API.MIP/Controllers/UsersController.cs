@@ -2,12 +2,12 @@
 using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces.Services;
 using FluentResponses.Extensions.Initializers;
+using FluentResponses.Extensions.MarkExtentions;
 using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using AuthorizeAttribute = ChatApp.Business.Core.Authentication.AuthorizeAttribute;
-using FluentResponses.Extensions.MarkExtentions;
 
 namespace ChatApp.API.MIP.Controllers
 {
@@ -30,7 +30,7 @@ namespace ChatApp.API.MIP.Controllers
             IResponse response = this.CreateResponse();
 
 
-            response.Include(_appService.ListUsers(HttpContext.GetUser(), groupType));
+            response.Include(_appService.ListUsers(HttpContext.GetUser(), (int)groupType));
 
 
             response.Successfull();

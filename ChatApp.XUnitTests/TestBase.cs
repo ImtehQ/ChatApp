@@ -1,9 +1,7 @@
 ﻿using ChatApp.Business.Core.AppServices;
 using ChatApp.Business.Core.Authentication;
-using ChatApp.Business.Core.Repositorys;
 using ChatApp.Business.Core.Services;
 using ChatApp.Domain.Interfaces;
-using ChatApp.Domain.Interfaces.Repositorys;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using Microsoft.Extensions.Options;
@@ -20,29 +18,30 @@ namespace ChatApp.XUnitTests
         public IInviteService inviteService;
         public IAppService appService;
 
-        public Mock<IGroupRepository> groupRepository;
-        public Mock<IUserRepository> userRepository;
-        public Mock<IGroupUserRepository> userGroupRepository;
-        public Mock<IMessageRepository> messageRepository;
-        public Mock<IInviteRepository> inviteRepository;
+        public Mock<IGenericRepository<User>> genericRepositoryUser;
+        public Mock<IGenericRepository<Group>> genericRepositoryGroup;
+        public Mock<IGenericRepository<GroupUser>> genericRepositoryGroupUser;
+        public Mock<IGenericRepository<Message>> genericRepositoryMessage;
+        public Mock<IGenericRepository<Invite>> genericRepositoryInvite;
 
         public TestBase()
         {
-            groupRepository = new Mock<IGroupRepository>();
-            userRepository = new Mock<IUserRepository>();
-            userGroupRepository = new Mock<IGroupUserRepository>();
-            messageRepository = new Mock<IMessageRepository>();
-            inviteRepository = new Mock<IInviteRepository>();
+            genericRepositoryUser = new Mock<IGenericRepository<User>>();
+            genericRepositoryGroup = new Mock<IGenericRepository<Group>>();
+            genericRepositoryGroupUser = new Mock<IGenericRepository<GroupUser>>();
+            genericRepositoryMessage = new Mock<IGenericRepository<Message>>();
+            genericRepositoryInvite = new Mock<IGenericRepository<Invite>>();
+
 
             var iJWTAuthService = new Mock<IJWTAuthService>();
 
             var JWT = new Mock<IOptions<JWTToken>>();
 
-            GroupService = new GroupService(groupRepository.Object);
-            userService = new UserService(userRepository.Object, JWT.Object, iJWTAuthService.Object);
-            groupUserService = new GroupUserService(userGroupRepository.Object);
-            messageService = new MessageService(messageRepository.Object);
-            inviteService = new InviteService(inviteRepository.Object);
+            userService = new UserService(genericRepositoryUser.Object, JWT.Object, iJWTAuthService.Object);
+            GroupService = new GroupService(genericRepositoryGroup.Object);
+            groupUserService = new GroupUserService(genericRepositoryGroupUser.Object);
+            messageService = new MessageService(genericRepositoryMessage.Object);
+            inviteService = new InviteService(genericRepositoryInvite.Object);
 
             appService = new AppService(GroupService, userService, groupUserService, messageService, inviteService);
         }

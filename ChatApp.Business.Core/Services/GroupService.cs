@@ -3,31 +3,25 @@ using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
-using FluentResponses.Extensions.Reports;
-using FluentResponses.Interfaces;
 using FluentResponses.Extensions.MarkExtentions;
+using FluentResponses.Interfaces;
 
 namespace ChatApp.Business.Core.Services
 {
 
     public class GroupService : IGroupService
     {
-        IGroupRepository _GroupRepository;
+        IGenericRepository<Group> _GroupRepository;
 
-        public GroupService(IGroupRepository groupRepository)
+        public GroupService(IGenericRepository<Group> groupRepository)
         {
             _GroupRepository = groupRepository;
-        }
-
-        public IResponse Create(string name, string password, int maxUsers = 0, GroupVisibilityEnum visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum groupType = GroupTypeEnum.OptionGroup)
-        {
-            throw new System.NotImplementedException();
         }
 
         public IResponse GetGroupById(int groupId)
         {
             IResponse response = this.CreateResponse();
-            var group = _GroupRepository.GetGroupByID(groupId);
+            var group = _GroupRepository.GetById(groupId);
             response.SetAttachment(group);
             return response.Successfull();
         }
@@ -35,6 +29,12 @@ namespace ChatApp.Business.Core.Services
         public IResponse Register(string name, string password, int maxUsers = 0, GroupVisibilityEnum visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum groupType = GroupTypeEnum.OptionGroup)
         {
             IResponse response = this.CreateResponse();
+
+            if (string.IsNullOrEmpty(name))
+                return response.Failed("name is invalid");
+            if (maxUsers < 2)
+                return response.Failed("maxUsers can't be below 2");
+
             Group group = new Group()
             {
                 Name = name,
@@ -44,7 +44,7 @@ namespace ChatApp.Business.Core.Services
                 type = groupType
             };
             response.SetAttachment(group);
-            _GroupRepository.InsertGroup(group);
+            _GroupRepository.Insert(group);
             _GroupRepository.Save();
 
             return response.Successfull();
@@ -53,7 +53,7 @@ namespace ChatApp.Business.Core.Services
         public IResponse RemoveGroup(int groupId)
         {
             IResponse response = this.CreateResponse();
-            _GroupRepository.DeleteGroup(groupId);
+            _GroupRepository.Delete(groupId);
             return response.Successfull();
         }
     }

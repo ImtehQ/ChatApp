@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Reflection;
+﻿using System.Net;
 
 namespace FluentResponses.Interfaces
 {
@@ -10,10 +7,9 @@ namespace FluentResponses.Interfaces
         object GetAttachment();
         T GetAttachment<T>();
         bool GetValid();
-        Response SetAttachment(object value);
-        Response SetAttachment<T>(T value);
+        Response SetAttachment(object value, bool autoValidate = true);
         Response SetValid(bool value);
-        T SetAttachmentReturn<T>(T value);
+        T SetAttachmentReturn<T>(T value, bool autoValidate = true);
         HttpStatusCode GetStatusCode();
     }
 }

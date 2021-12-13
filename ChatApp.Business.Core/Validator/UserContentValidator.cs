@@ -1,6 +1,5 @@
 ﻿using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.MarkExtentions;
-using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 
 namespace ChatApp.Business.Core.Validator

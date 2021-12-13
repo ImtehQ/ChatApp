@@ -1,10 +1,9 @@
 ﻿using ChatApp.Domain.Enums;
-using ChatApp.Domain.Interfaces.Repositorys;
+using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.MarkExtentions;
-using FluentResponses.Extensions.Reports;
 using FluentResponses.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +13,9 @@ namespace ChatApp.Business.Core.Services
 {
     public class GroupUserService : IGroupUserService
     {
-        IGroupUserRepository _GroupUserRepository;
+        IGenericRepository<GroupUser> _GroupUserRepository;
 
-        public GroupUserService(IGroupUserRepository groupUserRepository)
+        public GroupUserService(IGenericRepository<GroupUser> groupUserRepository)
         {
             _GroupUserRepository = groupUserRepository;
         }
@@ -25,13 +24,15 @@ namespace ChatApp.Business.Core.Services
         {
             IResponse response = this.CreateResponse();
 
-            return response.SetAttachment(_GroupUserRepository.GetGroupUsers()
+            return response.SetAttachment(_GroupUserRepository.GetAll()
                 .Where(u => u.Id == user.UserId)
                 .Select(x => x.Group).ToList()).Successfull();
         }
+
         public IResponse AddGroupUser(User user, Group group, AccountRoleEnum accountRoleWithinGroup)
         {
-            _GroupUserRepository.Insert(user, group, accountRoleWithinGroup);
+            GroupUser groupUser = new GroupUser() { Group = group, User = user, AccountRole = accountRoleWithinGroup };
+            _GroupUserRepository.Insert(groupUser);
             _GroupUserRepository.Save();
             return this.CreateResponse().Successfull();
         }
@@ -41,7 +42,7 @@ namespace ChatApp.Business.Core.Services
 
             List<GroupUser> Users = new List<GroupUser>();
 
-            var groupUsers = _GroupUserRepository.GetGroupUsers().ToList();
+            var groupUsers = _GroupUserRepository.GetAll().ToList();
 
             if (groupType == GroupTypeEnum.OptionGeneral)
             {
@@ -49,51 +50,46 @@ namespace ChatApp.Business.Core.Services
             }
             else if (groupType == GroupTypeEnum.OptionPrivate || groupType == GroupTypeEnum.OptionGroup)
             {
-                Users = _GroupUserRepository.GetGroupUsers()
+                Users = _GroupUserRepository.GetAll()
                     .Where(g => g.Group.type == groupType && g.User.UserId == user.UserId).ToList();
             }
 
             var something = Users.Select(u => new { userId = u.User.UserId, role = u.AccountRole });
 
-            response.SetAttachment(Users);
+            response.SetAttachment(something);
 
-            if (Users.Count > 0)
-                return response.Successfull(HttpStatusCode.OK);
-            else
-                return response.Failed(HttpStatusCode.BadRequest);
+            return response.Successfull();
         }
 
         public IResponse Join(Group group, User user, AccountRoleEnum accountRole)
         {
 
-            _GroupUserRepository.Insert(user, group, accountRole);
+            GroupUser groupUser = new GroupUser() { Group = group, User = user, AccountRole = accountRole };
+            _GroupUserRepository.Insert(groupUser);
 
             return this.CreateResponse().Successfull();
         }
 
         public IResponse RemoveGroup(Group group)
         {
-            _GroupUserRepository.DeleteGroupUser(group);
+            _GroupUserRepository.Delete(_GroupUserRepository.GetAll().Where(g => g.Group == group).FirstOrDefault());
             return this.CreateResponse().Successfull();
         }
 
         public IResponse RemoveUser(User user, Group group)
         {
-            _GroupUserRepository.DeleteUserFromGroupUsers(user, group);
+            GroupUser gu = _GroupUserRepository.GetAll().Where(g => g.Group == group && g.User == user).FirstOrDefault();
+            _GroupUserRepository.Delete(gu);
+
             return this.CreateResponse().Successfull();
         }
 
         public IResponse GetAccountRoleByUser(User user, Group group)
         {
             IResponse response = this.CreateResponse();
-            var accountRole = _GroupUserRepository.GetGroupUser(user, group).AccountRole;
+            var accountRole = _GroupUserRepository.GetAll().Where(g => g.Group == group && g.User == user).FirstOrDefault().AccountRole;
             response.SetAttachment(accountRole);
             return response.Successfull();
-        }
-
-        public IResponse Insert(User user, Group group, AccountRoleEnum accountRoleWithinGroup)
-        {
-            throw new System.NotImplementedException();
         }
     }
 }

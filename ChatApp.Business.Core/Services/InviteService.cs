@@ -1,18 +1,17 @@
-﻿using ChatApp.Business.Core.Repositorys;
+﻿using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
-using FluentResponses.Extensions.Reports;
-using FluentResponses.Interfaces;
 using FluentResponses.Extensions.MarkExtentions;
+using FluentResponses.Interfaces;
 
 namespace ChatApp.Business.Core.Services
 {
     public class InviteService : IInviteService
     {
-        IInviteRepository _InviteRepository;
+        IGenericRepository<Invite> _InviteRepository;
 
-        public InviteService(IInviteRepository inviteRepository)
+        public InviteService(IGenericRepository<Invite> inviteRepository)
         {
             _InviteRepository = inviteRepository;
         }
@@ -20,7 +19,7 @@ namespace ChatApp.Business.Core.Services
         public IResponse GetInviteById(int inviteId)
         {
             IResponse response = this.CreateResponse();
-            response.SetAttachment(_InviteRepository.GetInviteById(inviteId));
+            response.SetAttachment(_InviteRepository.GetById(inviteId));
             return response.Successfull();
         }
 

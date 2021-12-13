@@ -2,10 +2,8 @@
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
 using FluentResponses.Extensions.Initializers;
-using FluentResponses.Extensions.Reports;
-using FluentResponses.Interfaces;
-using FluentResponses.Extensions.Initializers;
 using FluentResponses.Extensions.MarkExtentions;
+using FluentResponses.Interfaces;
 
 namespace ChatApp.Business.Core.AppServices
 {
@@ -31,13 +29,11 @@ namespace ChatApp.Business.Core.AppServices
         {
             IResponse response = this.CreateResponse();
 
-            if (response.GetValid() == false) return response.Failed();
-
-            Group group = response.Include(_GroupService.Create(name, password, maxUsers, Visibility, GroupType)).GetAttachment<Group>();
+            Group group = response.Include(_GroupService.Register(name, password, maxUsers, Visibility, GroupType)).GetAttachment<Group>();
 
             if (response.GetValid() == false) return response.Failed();
 
-            return response.Include(_GroupUserService.Insert(
+            return response.Include(_GroupUserService.AddGroupUser(
                 user, group, AccountRoleEnum.RoleAdmin)).Successfull();
         }
 
@@ -52,7 +48,7 @@ namespace ChatApp.Business.Core.AppServices
             Group group = response.Include(_GroupService.GetGroupById(invite.GroupId)).GetAttachment<Group>();
             if (response.GetValid() == false) return response.Failed();
 
-            response.Include(_GroupUserService.Insert(
+            response.Include(_GroupUserService.AddGroupUser(
                 user, group, AccountRoleEnum.RoleUser));
             if (response.GetValid() == false) return response.Failed();
 
@@ -65,7 +61,7 @@ namespace ChatApp.Business.Core.AppServices
 
             User user = response.Include(_UserService.GetUserById(userId)).GetAttachment<User>();
 
-            Group group = response.Include(_GroupService.Create("Invite chat", "", 2,
+            Group group = response.Include(_GroupService.Register("Invite chat", "", 2,
                 GroupVisibilityEnum.OptionPrivate, GroupTypeEnum.OptionPrivate)).GetAttachment<Group>();
 
             response.Include(_GroupUserService.Join(group, sender, AccountRoleEnum.RoleAdmin));
