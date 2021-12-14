@@ -87,8 +87,11 @@ namespace ChatApp.Business.Core.Services
         public IResponse GetAccountRoleByUser(User user, Group group)
         {
             IResponse response = this.CreateResponse();
-            var accountRole = _GroupUserRepository.GetAll().Where(g => g.Group == group && g.User == user).FirstOrDefault().AccountRole;
-            response.SetAttachment(accountRole);
+            GroupUser groupUser = _GroupUserRepository.GetAll().FirstOrDefault(g => g.Group.GroupId == group.GroupId && g.User.UserId == user.UserId);
+            if (groupUser == null)
+                return response.Failed("groupUser not found");
+
+            response.SetAttachment(groupUser.AccountRole);
             return response.Successfull();
         }
     }

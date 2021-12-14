@@ -1,5 +1,6 @@
 ﻿using FluentResponses.Interfaces;
 using System;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 
@@ -20,7 +21,7 @@ namespace FluentResponses
         internal Response(object Caller, string MethodName)
         {
             Type Source = Caller.GetType();
-            Invoker = Source.GetMethod(MethodName);
+            Invoker = Source.GetMethods().FirstOrDefault(m => m.Name == MethodName);
             SourceString = Source.Name;
             if (Invoker != null)
                 Parameters = Invoker.GetParameters();

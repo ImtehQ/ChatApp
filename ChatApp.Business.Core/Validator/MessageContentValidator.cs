@@ -1,23 +1,14 @@
-﻿using FluentResponses.Interfaces;
+﻿using FluentResponses.Extensions.MarkExtentions;
+using FluentResponses.Interfaces;
 using System;
 
-namespace ChatApp.Business.Core.Validator
+namespace ChatApp.Business.Core.MessageValidator
 {
-    public static class MessageContentValidator
+    public static class MessageValidator
     {
-        //public static IResponse CheckContent(string message)
-        //{
-        //    IResponse response = new Response(MethodCode.CheckMessageContent, LayerCode.Validator, message);
-
-        //    message = message.ToLower();
-        //    if (message.Contains("kut"))
-        //        return response.Failed(System.Net.HttpStatusCode.Forbidden);
-
-        //    return response.Successfull();
-        //}
-        internal static IResponse CheckContent(string message)
+        internal static IResponse CheckContent(this IResponse response, string message)
         {
-            throw new NotImplementedException();
+            return response.Successfull();
         }
     }
 }

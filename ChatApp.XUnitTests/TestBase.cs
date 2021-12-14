@@ -4,6 +4,7 @@ using ChatApp.Business.Core.Services;
 using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
 using ChatApp.Domain.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Moq;
 
@@ -24,6 +25,8 @@ namespace ChatApp.XUnitTests
         public Mock<IGenericRepository<Message>> genericRepositoryMessage;
         public Mock<IGenericRepository<Invite>> genericRepositoryInvite;
 
+        public IJWTAuthService iJWTAuthService;
+
         public TestBase()
         {
             genericRepositoryUser = new Mock<IGenericRepository<User>>();
@@ -32,12 +35,25 @@ namespace ChatApp.XUnitTests
             genericRepositoryMessage = new Mock<IGenericRepository<Message>>();
             genericRepositoryInvite = new Mock<IGenericRepository<Invite>>();
 
-
-            var iJWTAuthService = new Mock<IJWTAuthService>();
+            var conf = new Mock<IConfiguration>();
+            conf.SetupGet(x => x[It.Is<string>(s => s == "Jwt:key")]).Returns("C1CF4B7DC4C4175B6618DE4F55CA4");
+            conf.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Issuer")]).Returns("LocalDuh");
+            conf.SetupGet(x => x[It.Is<string>(s => s == "Jwt:Audience")]).Returns("LocalDuhUser");
+            conf.SetupGet(x => x[It.Is<string>(s => s == "Jwt:DurationInMinutes")]).Returns("30");
+            //          "JWT": {
+            //              "key": "C1CF4B7DC4C4175B6618DE4F55CA4",
+            //  "Issuer": "LocalDuh",
+            //  "Audience": "LocalDuhUser",
+            //  "DurationInMinutes": 30
+            //}
 
             var JWT = new Mock<IOptions<JWTToken>>();
 
-            userService = new UserService(genericRepositoryUser.Object, JWT.Object, iJWTAuthService.Object);
+            iJWTAuthService = new JWTAuthService(conf.Object);
+
+            
+
+            userService = new UserService(genericRepositoryUser.Object, JWT.Object, iJWTAuthService);
             GroupService = new GroupService(genericRepositoryGroup.Object);
             groupUserService = new GroupUserService(genericRepositoryGroupUser.Object);
             messageService = new MessageService(genericRepositoryMessage.Object);

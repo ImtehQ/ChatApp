@@ -1,4 +1,4 @@
-﻿using ChatApp.Business.Core.Validator;
+﻿using ChatApp.Business.Core.MessageValidator;
 using ChatApp.Domain.Enums;
 using ChatApp.Domain.Interfaces;
 using ChatApp.Domain.Interfaces.Services;
@@ -51,7 +51,7 @@ namespace ChatApp.Business.Core.Services
         {
             IResponse response = this.CreateResponse();
 
-            response.Include(MessageContentValidator.CheckContent(message));
+            response.CheckContent(message);
             if (response.GetValid() == false)
                 return response.Failed();
 

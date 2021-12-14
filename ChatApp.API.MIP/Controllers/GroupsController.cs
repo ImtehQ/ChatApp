@@ -56,7 +56,7 @@ namespace ChatApp.API.MIP.Controllers
 
         [HttpPost]
         [Route("groups/join")]
-        [Authorize(AccountRoleEnum.RoleUser)] // Missing group id so no idea where you need to be rolemod for...
+        [Authorize(AccountRoleEnum.RoleUser)]
         public IActionResult JoinGroup(int GroupId, int UserId, string Message)
         {
             IResponse response = this.CreateResponse();
@@ -80,7 +80,16 @@ namespace ChatApp.API.MIP.Controllers
         public IActionResult RemoveUserFromGroup(User user, int GroupId)
         {
             IResponse response = this.CreateResponse();
-            response.Include(_appService.RemoveUserFromGroup(user, GroupId));
+            response.Include(_appService.RemoveSelfFromGroup(user, GroupId));
+            return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
+        }
+        [HttpPost]
+        [Route("groups/removeUser")]
+        [Authorize(AccountRoleEnum.RoleUser)]
+        public IActionResult RemoveOtherUserFromGroup(User user, int userId, int GroupId)
+        {
+            IResponse response = this.CreateResponse();
+            response.Include(_appService.RemoveOtherUserFromGroup(user, userId, GroupId));
             return StatusCode((int)response.GetStatusCode(), response.ReportMessage());
         }
     }

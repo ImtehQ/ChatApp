@@ -4,6 +4,6 @@ namespace ChatApp.Business.Core.Authentication
 {
     public interface IJWTAuthService
     {
-        AuthenticationModel GetToken(User user, JWTToken _jwt);
+        AuthenticationModel GetToken(User user);
     }
 }

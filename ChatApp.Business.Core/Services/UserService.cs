@@ -54,7 +54,7 @@ namespace ChatApp.Business.Core.Services
             if (user.PasswordHash != pwsHash)
                 return response.Failed(username, HttpStatusCode.Unauthorized);
 
-            response.SetAttachment(_JWTAuthService.GetToken(user, _JWTToken));
+            response.SetAttachment(_JWTAuthService.GetToken(user));
 
             return response.Successfull();
         }

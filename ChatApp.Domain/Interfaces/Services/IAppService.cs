@@ -18,10 +18,12 @@ namespace ChatApp.Domain.Interfaces.Services
         IResponse ListGroups(int GroupId, User user);
         IResponse RegisterGroup(User user, string Name, string Password, int MaxUsers = 0, GroupVisibilityEnum Visibility = GroupVisibilityEnum.OptionPublic, GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup);
         IResponse RemoveGroup(int GroupId);
-        IResponse RemoveUserFromGroup(User user, int GroupId);
         //--------------
         IResponse PullMessages(int pageNr, int groupId);
         IResponse SendMessage(string Message, User Sender, int Type, int TypeId);
+        IResponse JoinGroupSelf(User sender, int groupId, string message);
+        IResponse RemoveOtherUserFromGroup(User sender, int userId, int groupId);
+        IResponse RemoveSelfFromGroup(User sender, int groupId);
         //--------------
     }
 }

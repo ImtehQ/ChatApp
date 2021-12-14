@@ -20,16 +20,16 @@ namespace ChatApp.Business.Core.Authentication
             _configuration = configuration;
         }
 
-        public AuthenticationModel GetToken(User user, JWTToken _jwt)
+        public AuthenticationModel GetToken(User user)
         {
             var authenticationModel = new AuthenticationModel();
-            JwtSecurityToken jwtSecurityToken = CreateJwtToken(user, _jwt);
+            JwtSecurityToken jwtSecurityToken = CreateJwtToken(user);
             authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authenticationModel.UserId = user.UserId;
             authenticationModel.UserName = user.UserName;
             return authenticationModel;
         }
-        private JwtSecurityToken CreateJwtToken(User user, JWTToken _jwt)
+        private JwtSecurityToken CreateJwtToken(User user)
         {
             var claims = new[]
             {
