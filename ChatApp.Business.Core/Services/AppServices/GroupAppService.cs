@@ -18,6 +18,13 @@ namespace ChatApp.Business.Core.AppServices
         public IResponse ListGroups(int groupId, int userId)
         {
             IResponse response = this.CreateResponse();
+
+            if (groupId <= 0)
+                return response.Failed("GroupId cant be 0 or less");
+
+            if (userId <= 0)
+                return response.Failed("userId cant be 0 or less");
+
             User user = response.Include(_UserService.GetUserById(userId)).GetAttachment<User>();
             _GroupUserService.GetGroupsByUser(user);
             return response.Successfull();
@@ -28,6 +35,9 @@ namespace ChatApp.Business.Core.AppServices
             GroupTypeEnum GroupType = GroupTypeEnum.OptionGroup)
         {
             IResponse response = this.CreateResponse();
+
+            if (user == null)
+                return response.Failed("Anomimomus not allowed");
 
             Group group = response.Include(_GroupService.Register(name, password, maxUsers, Visibility, GroupType)).GetAttachment<Group>();
 
@@ -41,6 +51,9 @@ namespace ChatApp.Business.Core.AppServices
         public IResponse InviteToGroup(User user, int inviteId)
         {
             IResponse response = this.CreateResponse();
+
+            if (user == null)
+                return response.Failed("Anomimomus not allowed");
 
             Invite invite = response.Include(_InviteService.GetInviteById(inviteId)).GetAttachment<Invite>();
             if (response.GetValid() == false) return response.Failed();

@@ -24,6 +24,7 @@ namespace ChatApp.Domain.Interfaces.Services
         IResponse JoinGroupSelf(User sender, int groupId, string message);
         IResponse RemoveOtherUserFromGroup(User sender, int userId, int groupId);
         IResponse RemoveSelfFromGroup(User sender, int groupId);
+        IResponse ListGroups(int groupId, int userId);
         //--------------
     }
 }
